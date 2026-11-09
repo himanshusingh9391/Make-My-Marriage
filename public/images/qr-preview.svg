@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" fill="none">
+  <rect width="640" height="640" rx="30" fill="#F9F7F1"/>
+  <rect x="28" y="28" width="584" height="584" rx="24" fill="white" stroke="#D9D2C5" stroke-width="3"/>
+  <g fill="#294B39">
+    <path d="M86 86h150v150H86zM112 112v98h98v-98h-98Zm25 25h48v48h-48v-48ZM404 86h150v150H404zM430 112v98h98v-98h-98Zm25 25h48v48h-48v-48ZM86 404h150v150H86zM112 430v98h98v-98h-98Zm25 25h48v48h-48v-48Z"/>
+    <path d="M274 92h38v38h-38zM326 92h22v58h-22zM272 154h52v22h-52zM344 166h38v38h-38zM274 198h38v38h-38zM260 270h38v38h-38zM314 250h22v52h-22zM352 262h54v22h-54zM425 270h38v38h-38zM477 258h22v52h-22zM526 270h38v38h-38zM270 326h58v22h-58zM350 316h38v38h-38zM406 326h58v22h-58zM486 326h22v52h-22zM538 326h26v38h-26zM266 366h38v38h-38zM326 374h22v54h-22zM366 384h54v22h-54zM434 376h38v38h-38zM516 392h48v22h-48zM270 434h52v22h-52zM354 438h38v38h-38zM414 440h22v52h-22zM456 434h52v22h-52zM526 444h38v38h-38zM266 498h38v38h-38zM314 490h54v22h-54zM386 506h38v38h-38zM448 490h22v54h-22zM486 506h78v22h-78z"/>
+  </g>
+  <rect x="208" y="540" width="224" height="38" rx="19" fill="#F2EAE0"/>
+  <text x="320" y="565" text-anchor="middle" fill="#8B6E5E" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="4">DEMO PREVIEW</text>
+</svg>
