@@ -10,6 +10,7 @@
 - Validate guest-event assignments for every RSVP operation.
 - Follow the documented API response envelope and update API/database documentation when contracts change.
 - Write tests for new functionality and avoid unnecessary dependencies.
+- Maintain `Docs/PROJECT_STATUS.md` as the project progress log. When a major feature is completed, add a dated entry with a concise summary and verification performed, then update the current status and next milestone. Keep it focused on progress; the specification documents remain the source of detailed requirements and design.
 - Ask before significant architecture or product-scope changes. Never silently remove existing requirements.
 
 <!-- BEGIN:nextjs-agent-rules -->

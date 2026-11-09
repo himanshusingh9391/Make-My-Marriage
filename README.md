@@ -50,7 +50,7 @@ Playwright is configured for Chromium. Install browser binaries when needed with
 
 ## Structure
 
-- `Docs/` — product, architecture, database, and API specifications
+- `Docs/` — project status plus product, architecture, database, and API specifications
 - `src/app/` — App Router pages and versioned API routes
 - `src/lib/` — database, environment, HTTP, and shared utility foundations
 - `tests/unit/` — example unit test; `tests/e2e/` is the configured Playwright location
