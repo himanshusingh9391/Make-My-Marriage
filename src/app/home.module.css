@@ -387,6 +387,185 @@
   font-size: 48px;
 }
 
+.overview {
+  padding: 36px 32px;
+  background: #f3f1ec;
+}
+
+.overviewContainer {
+  width: min(100%, 1190px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(205px, .72fr) minmax(0, 1.8fr);
+  align-items: center;
+  gap: 34px;
+}
+
+.overviewHeading {
+  min-width: 0;
+}
+
+.overviewEyebrow {
+  margin: 0 0 8px;
+  color: var(--rose);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .15em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.overviewHeading h2 {
+  margin: 0;
+  color: #294b39;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(25px, 2.8vw, 34px);
+  font-weight: 400;
+  letter-spacing: -.035em;
+  line-height: 1.15;
+}
+
+.overviewHeading > p:not(.overviewEyebrow) {
+  max-width: 290px;
+  margin: 9px 0 12px;
+  color: #77786f;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.demoNote {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid #e3ded4;
+  border-radius: 999px;
+  color: #7b786f;
+  font-size: 7px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.overviewContent {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(155px, .78fr) minmax(0, 2fr);
+  align-items: stretch;
+  gap: 12px;
+}
+
+.countdownCard {
+  min-width: 0;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 10px;
+  background: #294b39;
+  color: #fff;
+}
+
+.countdownIcon,
+.statIcon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.countdownIcon {
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, .11);
+  color: #e1bd9e;
+}
+
+.countdownCard > p {
+  margin: 0;
+  color: rgba(255, 255, 255, .72);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.countdownValue {
+  margin-top: 4px;
+  color: #fff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(34px, 4vw, 48px);
+  letter-spacing: -.045em;
+  line-height: 1.05;
+}
+
+.countdownValue span {
+  color: #e1bd9e;
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.countdownCaption {
+  margin-top: 7px;
+  color: rgba(255, 255, 255, .78);
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.overviewStats {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.overviewStat {
+  min-width: 0;
+  min-height: 96px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  column-gap: 9px;
+  border: 1px solid #e9e5dc;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .78);
+}
+
+.statIcon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  background: #f2eee7;
+  color: #a66c57;
+}
+
+.overviewStat > strong {
+  overflow: hidden;
+  color: #294b39;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statLabel {
+  margin-top: 3px;
+  color: #57685b;
+  font-size: 8px;
+  font-weight: 650;
+}
+
+.statDetail {
+  grid-column: 2;
+  margin-top: 3px;
+  color: #8a887f;
+  font-size: 7px;
+  line-height: 1.4;
+}
+
 .verse {
   min-height: 205px;
   padding: 34px 24px;
@@ -1288,6 +1467,20 @@
     grid-template-columns: 155px minmax(0, 1fr) 175px;
     gap: 20px;
   }
+
+  .overviewContainer {
+    grid-template-columns: minmax(190px, .72fr) minmax(0, 1.8fr);
+    gap: 22px;
+  }
+
+  .overviewContent {
+    grid-template-columns: minmax(145px, .78fr) minmax(0, 2fr);
+  }
+
+  .overviewStat {
+    padding-inline: 10px;
+    column-gap: 7px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1367,6 +1560,27 @@
     top: -19px;
     right: -6px;
     font-size: 34px;
+  }
+
+  .overview {
+    padding: 30px 22px;
+  }
+
+  .overviewContainer {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .overviewHeading h2 {
+    font-size: 30px;
+  }
+
+  .overviewHeading > p:not(.overviewEyebrow) {
+    max-width: 430px;
+  }
+
+  .overviewContent {
+    grid-template-columns: minmax(160px, .78fr) minmax(0, 2fr);
   }
 
   .verse {
@@ -1560,6 +1774,69 @@
 
   .heroImageFrame {
     height: 240px;
+  }
+
+  .overview {
+    padding: 28px 17px;
+  }
+
+  .overviewHeading h2 {
+    font-size: 28px;
+  }
+
+  .overviewContent {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .countdownCard {
+    min-height: 104px;
+    padding: 13px 15px;
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-content: center;
+    align-items: center;
+    column-gap: 10px;
+  }
+
+  .countdownIcon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+
+  .countdownCard > p {
+    grid-column: 2;
+  }
+
+  .countdownValue {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    margin: 0;
+    font-size: 34px;
+  }
+
+  .countdownValue span {
+    font-size: 13px;
+  }
+
+  .countdownCaption {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 4px;
+  }
+
+  .overviewStats {
+    gap: 8px;
+  }
+
+  .overviewStat {
+    min-height: 88px;
+    padding: 10px 11px;
+  }
+
+  .overviewStat > strong {
+    font-size: 18px;
   }
 
   .imageCaption {

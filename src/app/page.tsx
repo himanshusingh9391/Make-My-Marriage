@@ -1,15 +1,19 @@
 import {
   ArrowDown,
   ArrowRight,
+  CalendarDays,
   Camera,
   CheckCircle2,
   Heart,
+  IndianRupee,
   MapPin,
   Menu,
   ShieldCheck,
   Star,
   Upload,
+  UsersRound,
 } from "lucide-react";
+import Link from "next/link";
 import CelebrationImage from "./celebration-image";
 import styles from "./home.module.css";
 
@@ -66,6 +70,33 @@ const ceremonies = [
       "A grand starlit soirée with live acoustic sufi and jazz ensembles, candlelit banquet tables, heartfelt toasts, and celebratory dancing.",
     venue: "Jagmandir Island Palace",
     attire: "Black Tie & Royal Velvet",
+  },
+];
+
+const planningStats = [
+  {
+    icon: CalendarDays,
+    value: ceremonies.length.toString(),
+    label: "Total events",
+    detail: "Across the celebration",
+  },
+  {
+    icon: CheckCircle2,
+    value: "24 / 38",
+    label: "Tasks completed",
+    detail: "A little more each day",
+  },
+  {
+    icon: UsersRound,
+    value: "248",
+    label: "Guests invited",
+    detail: "Across all events",
+  },
+  {
+    icon: IndianRupee,
+    value: "₹28.45L",
+    label: "Total invested",
+    detail: "Recorded expenses",
   },
 ];
 
@@ -222,17 +253,12 @@ export default function HomePage() {
             <a href="#photo-share">Photo Share</a>
           </nav>
           <div className={styles.headerActions}>
-            <button
-              className={styles.signIn}
-              type="button"
-              disabled
-              title="Sign in will be available soon"
-            >
+            <Link className={styles.signIn} href="/sign-in">
               Sign in
-            </button>
-            <a className={styles.headerButton} href="#ceremonies">
+            </Link>
+            <Link className={styles.headerButton} href="/sign-up">
               Start Planning <ArrowRight aria-hidden="true" size={14} />
-            </a>
+            </Link>
             <details className={styles.mobileMenu}>
               <summary aria-label="Open navigation menu">
                 <Menu aria-hidden="true" size={18} />
@@ -305,6 +331,43 @@ export default function HomePage() {
                 </div>
               </div>
               <span className={styles.heroImageOrnament} aria-hidden="true">❋</span>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.overview} aria-labelledby="overview-title">
+          <div className={styles.overviewContainer}>
+            <div className={styles.overviewHeading}>
+              <p className={styles.overviewEyebrow}>Your celebration at a glance</p>
+              <h2 id="overview-title">The countdown is on.</h2>
+              <p>Every thoughtful detail brings the big day a little closer.</p>
+              <span className={styles.demoNote}>Sample planning figures</span>
+            </div>
+            <div className={styles.overviewContent}>
+              <article className={styles.countdownCard} aria-label="12 days until the wedding">
+                <span className={styles.countdownIcon} aria-hidden="true">
+                  <Heart size={17} strokeWidth={1.5} />
+                </span>
+                <p>Counting down</p>
+                <div className={styles.countdownValue}>12 <span>days</span></div>
+                <span className={styles.countdownCaption}>until Aanya &amp; Kabir’s celebration</span>
+              </article>
+              <div className={styles.overviewStats}>
+                {planningStats.map((stat) => {
+                  const Icon = stat.icon;
+
+                  return (
+                    <article className={styles.overviewStat} key={stat.label}>
+                      <span className={styles.statIcon} aria-hidden="true">
+                        <Icon size={16} strokeWidth={1.6} />
+                      </span>
+                      <strong>{stat.value}</strong>
+                      <span className={styles.statLabel}>{stat.label}</span>
+                      <span className={styles.statDetail}>{stat.detail}</span>
+                    </article>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>

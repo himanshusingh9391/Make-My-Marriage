@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { AppError } from "@/lib/http/app-error";
 
 const optionalSecret = z.preprocess(
   (value) =>
@@ -13,6 +14,7 @@ const baseEnvironmentSchema = z.object({
     .default("development"),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   MONGODB_URI: optionalSecret,
+  MONGODB_DB_NAME: z.string().trim().min(1).default("mmm-db"),
   SESSION_SECRET: optionalSecret,
   TOKEN_HASH_SECRET: optionalSecret,
   RESEND_API_KEY: optionalSecret,
@@ -30,16 +32,13 @@ const baseEnvironmentSchema = z.object({
 export const environment = baseEnvironmentSchema.parse(process.env);
 
 export function requireMongoUri(): string {
-  const uri = z
-    .string()
-    .trim()
-    .min(1, "MONGODB_URI is required to connect to MongoDB")
-    .refine(
-      (value) =>
-        value.startsWith("mongodb://") || value.startsWith("mongodb+srv://"),
-      "MONGODB_URI must use mongodb:// or mongodb+srv://",
-    )
-    .parse(environment.MONGODB_URI);
+  const uri = environment.MONGODB_URI?.trim();
+  if (!uri) {
+    throw new AppError("MONGODB_URI is required to connect to MongoDB.", "SERVER_CONFIGURATION_ERROR", 503);
+  }
+  if (!uri.startsWith("mongodb://") && !uri.startsWith("mongodb+srv://")) {
+    throw new AppError("MONGODB_URI must use mongodb:// or mongodb+srv://.", "SERVER_CONFIGURATION_ERROR", 503);
+  }
 
   return uri;
 }

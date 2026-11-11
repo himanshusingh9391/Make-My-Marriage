@@ -131,6 +131,7 @@ A client-provided `weddingId`, `guestId`, `eventId`, or other identifier is not 
 | 415 | Unsupported media type |
 | 422 | Business rule validation failure |
 | 429 | Rate limit exceeded |
+| 503 | A required service is unavailable |
 | 500 | Internal server error |
 | 502 | External provider failure |
 
@@ -187,9 +188,13 @@ Request:
 
 ```json
 {
-  "fullName": "Rahul Sharma",
-  "email": "rahul@example.com",
-  "password": "StrongPassword123!"
+  "partnerOneName": "Ananya Sen",
+  "partnerTwoName": "Vikram Rao",
+  "email": "ananya@example.com",
+  "weddingDate": "2027-02-14",
+  "city": "Udaipur",
+  "password": "StrongPassword123!",
+  "privacyAcknowledged": true
 }
 ```
 
@@ -199,19 +204,28 @@ Response:
 {
   "success": true,
   "data": {
-    "message": "Registration successful. Verify your email."
+    "message": "Your wedding suite is ready. Verify your email to sign in.",
+    "emailVerificationRequired": true
   }
 }
 ```
 
 Rules:
 
+- Create the owner account and one initial `DRAFT` wedding workspace from the supplied couple names, optional date, and city.
+- The first partner name is the account's display name; the second partner name is stored on the wedding workspace.
+- Set the initial wedding timezone to `Asia/Kolkata`.
+- Require `privacyAcknowledged` to be `true` before storing the supplied personal and wedding details.
 - Normalize email.
 - Enforce unique normalized email.
-- Validate password policy.
+- Require at least 12 characters, with lowercase, uppercase, numeric, and symbol characters; maximum 128 characters.
 - Hash password using Argon2id.
 - Create verification token and store only its hash.
+- Return `emailVerificationRequired` so the client can route to the correct sign-in guidance.
 - Never return password hashes or raw verification tokens in the API response.
+- If verification email delivery is unavailable, keep the account pending and allow the owner to request another link.
+- In local development only, if Resend credentials are absent, activate the account immediately and return `emailVerificationRequired: false`. Email verification remains required in production.
+- If MongoDB cannot be reached, return a structured `503 DATABASE_UNAVAILABLE` response; do not attempt to create the account or wedding without persistence.
 
 ### 5.2 Login
 
@@ -224,7 +238,8 @@ Request:
 ```json
 {
   "email": "rahul@example.com",
-  "password": "StrongPassword123!"
+  "password": "StrongPassword123!",
+  "rememberMe": false
 }
 ```
 
@@ -243,7 +258,7 @@ Response:
 }
 ```
 
-The server sets the session cookie. Do not return the raw session token in JSON.
+The server sets the session cookie. Do not return the raw session token in JSON. A standard session lasts one day; opting in to “remember me” extends it to 30 days.
 
 ### 5.3 Logout
 

@@ -1,11 +1,11 @@
 # Make My Marriage — Database Design Document (DDD)
-**Version:** 2.0 | **Status:** Draft for review | **Database:** MongoDB Atlas | **ODM:** Mongoose
+**Version:** 2.0 | **Status:** Draft for review | **Database:** MongoDB Atlas (`MONGODB_DB_NAME`, default `mmm-db`) | **ODM:** Mongoose
 
 ## 1. Design principles
 Shared collections, logically tenant-isolated by `weddingId`. One user owns many weddings; one owner per wedding in v2.0; guests are accountless. Internal IDs are ObjectIds. Store UTC timestamps; render in wedding timezone. All wedding documents include `weddingId`. Client ID is not authorization.
 
 ## 2. Collections
-`users`, `user_sessions`, `email_verification_tokens`, `password_reset_tokens`, `weddings`, `wedding_settings`, `events`, `guests`, `guest_events`, `rsvps`, `tasks`, `expenses`, `vendors`, `albums`, `photos`, `email_logs`, `activity_logs`.
+`users`, `user_sessions`, `email_verification_tokens`, `password_reset_tokens`, `auth_rate_limits`, `weddings`, `wedding_settings`, `events`, `guests`, `guest_events`, `rsvps`, `tasks`, `expenses`, `vendors`, `albums`, `photos`, `email_logs`, `activity_logs`.
 
 ## 3. ER diagram
 ```mermaid
@@ -36,7 +36,8 @@ erDiagram
 - **users:** `_id`, fullName, email, normalizedEmail, passwordHash, status (ACTIVE/PENDING_VERIFICATION/SUSPENDED), emailVerifiedAt, lastLoginAt, timestamps.
 - **user_sessions:** `_id`, userId, sessionTokenHash, expiresAt, revokedAt, timestamps.
 - **email_verification_tokens / password_reset_tokens:** `_id`, userId, tokenHash, expiresAt, usedAt, timestamps. Single-use, hashed, app-enforced expiry.
-- **weddings:** `_id`, ownerUserId, weddingName, unique slug, couple names, weddingDate, timezone, contactEmail/Phone, status (DRAFT/ACTIVE/ARCHIVED/DELETED), publishedAt, timestamps.
+- **weddings:** `_id`, ownerUserId, weddingName, unique slug, partnerOneName, partnerTwoName, city, weddingDate, timezone, contactEmail/Phone, status (DRAFT/ACTIVE/ARCHIVED/DELETED), publishedAt, timestamps. Sign-up creates one initial DRAFT workspace.
+- **auth_rate_limits:** HMAC-hashed action/client key, attempt count, expiry timestamp; TTL cleanup. No raw IP address or email is stored.
 - **wedding_settings:** weddingId unique; theme; website publication, description, countdown, livestream; RSVP defaults/deadline updates; gallery enabled/visibility; email invitation/reminder toggles.
 - **events:** weddingId, name/type, description, startDate/endDate/timezone, venue object (address, GeoJSON Point, Place ID, directions URL), RSVP deadline, maxAttendees, dressCode, notes, status (DRAFT/PUBLISHED/CANCELLED), timestamps.
 - **guests:** weddingId, fullName, email/normalizedEmail, phone, groupName, invitationTokenHash, invitationStatus, invitationSentAt, notes, timestamps.
@@ -61,6 +62,8 @@ db.password_reset_tokens.createIndex({ tokenHash: 1 }, { unique: true });
 db.password_reset_tokens.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 db.weddings.createIndex({ ownerUserId: 1, createdAt: -1 });
 db.weddings.createIndex({ slug: 1 }, { unique: true });
+db.auth_rate_limits.createIndex({ keyHash: 1 }, { unique: true });
+db.auth_rate_limits.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 db.wedding_settings.createIndex({ weddingId: 1 }, { unique: true });
 db.events.createIndex({ weddingId: 1, startDate: 1 });
 db.events.createIndex({ weddingId: 1, status: 1, startDate: 1 });
@@ -114,3 +117,6 @@ Archive: restrict writes; optionally unpublish and revoke invitation/album links
 
 ## 9. Operational safeguards
 Least privilege MongoDB credentials; secret manager/environment variables; index deployment reviewed; audit trail for owner actions; logs omit secrets, raw tokens and unnecessary PII; monitor slow queries/index use; verify backup and R2 cleanup. MongoDB does not enforce cross-collection foreign keys—application services validate relationships.
+
+## 10. Database initialization
+Run `npm run db:init` to create the documented collections and indexes in the configured database. The script is idempotent and does not insert sample users or wedding data; account and wedding records are created by the sign-up flow.
