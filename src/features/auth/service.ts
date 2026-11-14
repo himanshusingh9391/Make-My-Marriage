@@ -10,12 +10,10 @@ import { PasswordResetToken } from "./models/password-reset-token";
 import { RateLimitEntry } from "./models/rate-limit-entry";
 import { UserSession } from "./models/user-session";
 import { User, type UserDocument } from "./models/user";
-import { Wedding } from "./models/wedding";
 import { registerSchema, type LoginInput, type RegisterInput } from "./schemas";
 import {
   createSessionToken,
   createVerificationToken,
-  createWeddingSlug,
   hashSessionToken,
   hashVerificationToken,
   REMEMBERED_SESSION_DAYS,
@@ -113,7 +111,7 @@ async function sendVerificationEmail(
   }
 }
 
-export async function registerAccountAndWedding(input: RegisterInput) {
+export async function registerAccount(input: RegisterInput) {
   const parsed = registerSchema.parse(input);
   const emailVerificationEnabled = environment.NODE_ENV !== "development" || Boolean(
     environment.RESEND_API_KEY && environment.RESEND_FROM_EMAIL,
@@ -136,7 +134,7 @@ export async function registerAccountAndWedding(input: RegisterInput) {
   let user: UserDocument;
   try {
     user = await User.create({
-      fullName: parsed.partnerOneName,
+      fullName: parsed.fullName,
       email: normalizedEmail,
       normalizedEmail,
       passwordHash,
@@ -151,19 +149,6 @@ export async function registerAccountAndWedding(input: RegisterInput) {
   }
 
   try {
-    const coupleName = `${parsed.partnerOneName} & ${parsed.partnerTwoName}`;
-    await Wedding.create({
-      ownerUserId: user._id,
-      weddingName: coupleName,
-      slug: createWeddingSlug(coupleName),
-      partnerOneName: parsed.partnerOneName,
-      partnerTwoName: parsed.partnerTwoName,
-      weddingDate: parsed.weddingDate ? new Date(`${parsed.weddingDate}T00:00:00.000Z`) : null,
-      city: parsed.city,
-      timezone: "Asia/Kolkata",
-      status: "DRAFT",
-    });
-
     if (verificationToken) {
       await EmailVerificationToken.create({
         userId: user._id,
@@ -173,7 +158,6 @@ export async function registerAccountAndWedding(input: RegisterInput) {
     }
   } catch (error) {
     await Promise.all([
-      Wedding.deleteMany({ ownerUserId: user._id }),
       EmailVerificationToken.deleteMany({ userId: user._id }),
       User.deleteOne({ _id: user._id }),
     ]);
@@ -185,22 +169,22 @@ export async function registerAccountAndWedding(input: RegisterInput) {
 
   if (verificationToken) {
     try {
-      await sendVerificationEmail(normalizedEmail, parsed.partnerOneName, verificationToken);
+      await sendVerificationEmail(normalizedEmail, parsed.fullName, verificationToken);
       return {
-        message: "Your wedding suite is ready. Verify your email to sign in.",
+        message: "Your account is ready. Verify your email, then sign in to set up your wedding.",
         emailVerificationRequired: true,
       };
     } catch {
       logger.error("Verification email delivery failed after account creation");
       return {
-        message: "Your wedding suite was created, but we could not send the verification email. Request a new link before signing in.",
+        message: "Your account was created, but we could not send the verification email. Request a new link before signing in.",
         emailVerificationRequired: true,
       };
     }
   }
   logger.info("Email verification skipped for local development account");
   return {
-    message: "Your wedding suite is ready. Sign in to continue.",
+    message: "Your account is ready. Sign in to set up your wedding.",
     emailVerificationRequired: false,
   };
 }
@@ -241,9 +225,6 @@ export async function resendVerificationForEmail(email: string): Promise<void> {
   const user = await User.findOne({ normalizedEmail, status: "PENDING_VERIFICATION" });
   if (!user) return;
 
-  const wedding = await Wedding.findOne({ ownerUserId: user._id, status: "DRAFT" });
-  if (!wedding) return;
-
   const token = createVerificationToken();
   await EmailVerificationToken.updateMany(
     { userId: user._id, usedAt: null },
@@ -255,7 +236,7 @@ export async function resendVerificationForEmail(email: string): Promise<void> {
     expiresAt: new Date(Date.now() + emailVerificationLifetimeMs),
   });
   try {
-    await sendVerificationEmail(normalizedEmail, wedding.partnerOneName, token);
+    await sendVerificationEmail(normalizedEmail, user.fullName, token);
   } catch {
     logger.error("Verification email resend failed");
   }

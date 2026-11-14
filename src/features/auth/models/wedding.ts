@@ -13,6 +13,7 @@ const weddingSchema = new Schema(
     partnerOneName: { type: String, required: true, trim: true, maxlength: 120 },
     partnerTwoName: { type: String, required: true, trim: true, maxlength: 120 },
     weddingDate: { type: Date, default: null },
+    weddingDateIsTentative: { type: Boolean, default: true, required: true },
     city: { type: String, required: true, trim: true, maxlength: 120 },
     timezone: { type: String, required: true, default: "Asia/Kolkata" },
     status: {

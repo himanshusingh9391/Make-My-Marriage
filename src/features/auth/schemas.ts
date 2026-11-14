@@ -10,14 +10,10 @@ const passwordSchema = z
   .regex(/[^A-Za-z0-9]/, "Add a symbol");
 
 export const registerSchema = z.object({
-  partnerOneName: z.string().trim().min(1).max(120),
-  partnerTwoName: z.string().trim().min(1).max(120),
+  fullName: z.string().trim().min(1).max(120),
   email: z.string().trim().email().max(254),
-  weddingDate: z.string().date().optional().or(z.literal("")),
-  city: z.string().trim().min(1).max(120),
   password: passwordSchema,
-  privacyAcknowledged: z.literal(true),
-});
+}).strict();
 
 export const loginSchema = z.object({
   email: z.string().trim().email().max(254),

@@ -36,7 +36,7 @@ erDiagram
 - **users:** `_id`, fullName, email, normalizedEmail, passwordHash, status (ACTIVE/PENDING_VERIFICATION/SUSPENDED), emailVerifiedAt, lastLoginAt, timestamps.
 - **user_sessions:** `_id`, userId, sessionTokenHash, expiresAt, revokedAt, timestamps.
 - **email_verification_tokens / password_reset_tokens:** `_id`, userId, tokenHash, expiresAt, usedAt, timestamps. Single-use, hashed, app-enforced expiry.
-- **weddings:** `_id`, ownerUserId, weddingName, unique slug, partnerOneName, partnerTwoName, city, weddingDate, timezone, contactEmail/Phone, status (DRAFT/ACTIVE/ARCHIVED/DELETED), publishedAt, timestamps. Sign-up creates one initial DRAFT workspace.
+- **weddings:** `_id`, ownerUserId, weddingName, unique slug, partnerOneName, partnerTwoName, city, weddingDate, weddingDateIsTentative, timezone, contactEmail/Phone, status (DRAFT/ACTIVE/ARCHIVED/DELETED), publishedAt, timestamps. The owner creates the first workspace from the authenticated dashboard after registering and signing in.
 - **auth_rate_limits:** HMAC-hashed action/client key, attempt count, expiry timestamp; TTL cleanup. No raw IP address or email is stored.
 - **wedding_settings:** weddingId unique; theme; website publication, description, countdown, livestream; RSVP defaults/deadline updates; gallery enabled/visibility; email invitation/reminder toggles.
 - **events:** weddingId, name/type, description, startDate/endDate/timezone, venue object (address, GeoJSON Point, Place ID, directions URL), RSVP deadline, maxAttendees, dressCode, notes, status (DRAFT/PUBLISHED/CANCELLED), timestamps.
@@ -119,4 +119,4 @@ Archive: restrict writes; optionally unpublish and revoke invitation/album links
 Least privilege MongoDB credentials; secret manager/environment variables; index deployment reviewed; audit trail for owner actions; logs omit secrets, raw tokens and unnecessary PII; monitor slow queries/index use; verify backup and R2 cleanup. MongoDB does not enforce cross-collection foreign keys—application services validate relationships.
 
 ## 10. Database initialization
-Run `npm run db:init` to create the documented collections and indexes in the configured database. The script is idempotent and does not insert sample users or wedding data; account and wedding records are created by the sign-up flow.
+Run `npm run db:init` to create the documented collections and indexes in the configured database. The script is idempotent and does not insert sample users or wedding data; sign-up creates the account, and the first wedding workspace is created from the authenticated dashboard.

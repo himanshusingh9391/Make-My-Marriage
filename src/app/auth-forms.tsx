@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, Heart, LockKeyhole, Mail, MapPin, UserRound } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
@@ -113,7 +113,7 @@ export function SignInForm({
     registered
       ? verificationRequired
         ? "Your account was created. Verify your email before signing in."
-        : "Your wedding suite is ready. Sign in to continue."
+        : "Your account is ready. Sign in to set up your wedding."
       : "",
   );
   const [messageType, setMessageType] = useState<"error" | "success">(
@@ -187,36 +187,29 @@ export function SignUpForm() {
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"error" | "success">("error");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     setMessage("");
-    const form = event.currentTarget;
-    const formData = new FormData(form);
+    const formData = new FormData(event.currentTarget);
 
     try {
       const response = await fetch("/api/v1/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          partnerOneName: formData.get("partnerOneName"),
-          partnerTwoName: formData.get("partnerTwoName"),
+          fullName: formData.get("fullName"),
           email: formData.get("email"),
-          weddingDate: formData.get("weddingDate") || undefined,
-          city: formData.get("city"),
           password,
-          privacyAcknowledged: formData.get("privacyAcknowledged") === "on",
         }),
       });
       const payload = await readApiResponse(response);
-      if (!response.ok) throw new Error(payload.error?.message ?? "We could not create your wedding suite.");
+      if (!response.ok) throw new Error(payload.error?.message ?? "We could not create your account.");
       const verificationParam = payload.data?.emailVerificationRequired ? "&verify=1" : "";
       router.replace(`/sign-in?registered=1${verificationParam}`);
     } catch (error) {
-      setMessageType("error");
-      setMessage(error instanceof Error ? error.message : "We could not create your wedding suite.");
+      setMessage(error instanceof Error ? error.message : "We could not create your account.");
     } finally {
       setPending(false);
     }
@@ -225,50 +218,28 @@ export function SignUpForm() {
   return (
     <>
       <AuthHeading
-        eyebrow="New atelier membership"
+        eyebrow="New account"
         title="Begin your story"
-        description="Curate multi-day traditions with poise and privacy."
+        description="Create your account first. You’ll add your wedding details after signing in."
       />
       <form className={styles.authForm} onSubmit={onSubmit}>
-        <div className={styles.authFieldsTwo}>
-          <div className={styles.authField}>
-            <label htmlFor="partner-one">Partner one full name</label>
-            <div className={styles.authInputWrap}><UserRound size={17} aria-hidden="true" /><input id="partner-one" name="partnerOneName" autoComplete="name" required maxLength={120} placeholder="e.g. Ananya Sen" /></div>
-          </div>
-          <div className={styles.authField}>
-            <label htmlFor="partner-two">Partner two full name</label>
-            <div className={styles.authInputWrap}><Heart size={17} aria-hidden="true" /><input id="partner-two" name="partnerTwoName" required maxLength={120} placeholder="e.g. Vikram Rao" /></div>
-          </div>
+        <div className={styles.authField}>
+          <label htmlFor="full-name">Full name</label>
+          <div className={styles.authInputWrap}><UserRound size={17} aria-hidden="true" /><input id="full-name" name="fullName" autoComplete="name" required maxLength={120} placeholder="Your full name" /></div>
         </div>
         <div className={styles.authField}>
-          <div className={styles.authFieldLabelRow}><label htmlFor="register-email">Wedding email</label><span>Confidential</span></div>
-          <div className={styles.authInputWrap}><Mail size={17} aria-hidden="true" /><input id="register-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="atelier@example.com" /></div>
-        </div>
-        <div className={styles.authFieldsTwo}>
-          <div className={styles.authField}>
-            <label htmlFor="wedding-date">Tentative wedding date</label>
-            <div className={styles.authInputWrap}><input id="wedding-date" name="weddingDate" type="date" /></div>
-          </div>
-          <div className={styles.authField}>
-            <label htmlFor="city">Destination or city</label>
-            <div className={styles.authInputWrap}><MapPin size={17} aria-hidden="true" /><input id="city" name="city" required maxLength={120} placeholder="e.g. Udaipur, Jaipur" /></div>
-          </div>
+          <div className={styles.authFieldLabelRow}><label htmlFor="register-email">Email</label><span>Confidential</span></div>
+          <div className={styles.authInputWrap}><Mail size={17} aria-hidden="true" /><input id="register-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" /></div>
         </div>
         <PasswordField id="new-password" label="Create vault password" hint="At least 12 characters" value={password} onChange={setPassword} />
-        <label className={styles.termsLabel}>
-          <input type="checkbox" name="privacyAcknowledged" required />
-          <span>I am authorized to provide these details and agree they will be used to create my private wedding suite.</span>
-        </label>
-        <AuthPrimaryButton disabled={pending}>{pending ? "Creating your suite…" : "Create wedding suite"}</AuthPrimaryButton>
-        <GoogleOption />
-        {message && <p className={messageType === "error" ? styles.authError : styles.authSuccess} role="status">{message}</p>}
+        <AuthPrimaryButton disabled={pending}>{pending ? "Creating your account…" : "Create account"}</AuthPrimaryButton>
+        {message && <p className={styles.authError} role="status">{message}</p>}
       </form>
-      <p className={styles.authSwitch}>Already curating a celebration? <Link href="/sign-in">Sign in</Link></p>
+      <p className={styles.authSwitch}>Already have an account? <Link href="/sign-in">Sign in</Link></p>
       <p className={styles.authPrivacy}><LockKeyhole size={14} aria-hidden="true" /> Protected account access · Your guest details stay private</p>
     </>
   );
 }
-
 export function VerificationStatus({ token }: { token: string }) {
   const [message, setMessage] = useState(
     token ? "Verifying your email…" : "This verification link is missing its token.",

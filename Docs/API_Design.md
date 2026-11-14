@@ -188,13 +188,9 @@ Request:
 
 ```json
 {
-  "partnerOneName": "Ananya Sen",
-  "partnerTwoName": "Vikram Rao",
+  "fullName": "Ananya Sen",
   "email": "ananya@example.com",
-  "weddingDate": "2027-02-14",
-  "city": "Udaipur",
-  "password": "StrongPassword123!",
-  "privacyAcknowledged": true
+  "password": "StrongPassword123!"
 }
 ```
 
@@ -204,7 +200,7 @@ Response:
 {
   "success": true,
   "data": {
-    "message": "Your wedding suite is ready. Verify your email to sign in.",
+    "message": "Your account is ready. Verify your email, then sign in to set up your wedding.",
     "emailVerificationRequired": true
   }
 }
@@ -212,10 +208,7 @@ Response:
 
 Rules:
 
-- Create the owner account and one initial `DRAFT` wedding workspace from the supplied couple names, optional date, and city.
-- The first partner name is the account's display name; the second partner name is stored on the wedding workspace.
-- Set the initial wedding timezone to `Asia/Kolkata`.
-- Require `privacyAcknowledged` to be `true` before storing the supplied personal and wedding details.
+- Create only the owner account. Wedding details are collected after the owner signs in.
 - Normalize email.
 - Enforce unique normalized email.
 - Require at least 12 characters, with lowercase, uppercase, numeric, and symbol characters; maximum 128 characters.
@@ -311,7 +304,7 @@ Rules:
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| POST | `/weddings` | Create wedding |
+| POST | `/weddings` | Create the owner's first wedding workspace |
 | GET | `/weddings` | List owned weddings |
 | GET | `/weddings/{weddingId}` | Get wedding |
 | PATCH | `/weddings/{weddingId}` | Update wedding |
@@ -329,13 +322,11 @@ Request:
 
 ```json
 {
-  "weddingName": "Rahul and Priya Wedding",
-  "couple": {
-    "partnerOneName": "Rahul",
-    "partnerTwoName": "Priya"
-  },
-  "weddingDate": "2027-02-14T00:00:00+05:30",
-  "timezone": "Asia/Kolkata"
+  "partnerOneName": "Rahul",
+  "partnerTwoName": "Priya",
+  "city": "Jaipur",
+  "weddingDate": "2027-02-14",
+  "weddingDateIsTentative": true
 }
 ```
 
@@ -346,13 +337,13 @@ Response:
   "success": true,
   "data": {
     "weddingId": "WEDDING_OBJECT_ID",
-    "weddingName": "Rahul and Priya Wedding",
-    "status": "DRAFT"
+    "weddingName": "Rahul & Priya",
+    "status": "ACTIVE"
   }
 }
 ```
 
-The server derives `ownerUserId` from the authenticated session. It must not accept an owner ID from the client.
+The server derives `ownerUserId` from the authenticated session. It must not accept an owner ID from the client. This first-workspace setup returns `409 WEDDING_ALREADY_EXISTS` if the owner already has a workspace. The server derives the wedding name and slug, and sets the timezone to `Asia/Kolkata`. The endpoint rejects cross-site fetches and mismatched `Origin` headers.
 
 ### 6.2 List Weddings
 

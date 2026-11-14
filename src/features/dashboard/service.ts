@@ -12,7 +12,7 @@ export async function getOwnerDashboard(userId: Types.ObjectId) {
   await connectToDatabase();
   const wedding = await Wedding.findOne({ ownerUserId: userId })
     .sort({ createdAt: -1 })
-    .select("weddingName partnerOneName partnerTwoName weddingDate city status")
+    .select("weddingName partnerOneName partnerTwoName weddingDate weddingDateIsTentative city status")
     .lean();
 
   if (!wedding) return null;
@@ -40,6 +40,7 @@ export async function getOwnerDashboard(userId: Types.ObjectId) {
       partnerOneName: wedding.partnerOneName,
       partnerTwoName: wedding.partnerTwoName,
       weddingDate: wedding.weddingDate?.toISOString() ?? null,
+      weddingDateIsTentative: wedding.weddingDateIsTentative ?? Boolean(wedding.weddingDate),
       city: wedding.city,
       status: wedding.status,
     },
