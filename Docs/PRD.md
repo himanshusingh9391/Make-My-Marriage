@@ -39,7 +39,7 @@ Collaborator/family roles, vendor accounts/marketplace transactions, payment pro
 - **DASHBOARD:** Upcoming events, RSVP totals/rates/headcount, pending invitations/tasks, expense actual totals, recent activity, check-in, all scoped to selected wedding.
 
 ## 6. Key user flows
-Onboarding: register with full name, email, and password → verify email when required → sign in → enter partner names, city/place, and tentative wedding date on the dashboard → view the wedding overview and countdown.
+Onboarding: register with full name, email, and password → verify email when required → sign in → enter wedding title and description, partner names, city/place, and tentative wedding date on the dashboard → view and edit the wedding overview and countdown.
 Planning: choose workspace → create events → add/assign guests → send invitations → collect RSVP → monitor dashboard → tasks/expenses/vendors/check-in.
 Guest: open token link → validate → see assigned events → respond → owner dashboard updates.
 Gallery: create album → request upload authorization → owner/workspace authorization → presigned R2 upload → verify object and metadata → authorized delivery.

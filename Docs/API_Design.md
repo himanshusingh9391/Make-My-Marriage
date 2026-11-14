@@ -322,6 +322,8 @@ Request:
 
 ```json
 {
+  "title": "Rahul and Priya’s Wedding",
+  "description": "A joyful celebration with family and friends.",
   "partnerOneName": "Rahul",
   "partnerTwoName": "Priya",
   "city": "Jaipur",
@@ -337,13 +339,13 @@ Response:
   "success": true,
   "data": {
     "weddingId": "WEDDING_OBJECT_ID",
-    "weddingName": "Rahul & Priya",
+    "weddingName": "Rahul and Priya’s Wedding",
     "status": "ACTIVE"
   }
 }
 ```
 
-The server derives `ownerUserId` from the authenticated session. It must not accept an owner ID from the client. This first-workspace setup returns `409 WEDDING_ALREADY_EXISTS` if the owner already has a workspace. The server derives the wedding name and slug, and sets the timezone to `Asia/Kolkata`. The endpoint rejects cross-site fetches and mismatched `Origin` headers.
+The server derives `ownerUserId` from the authenticated session. It must not accept an owner ID from the client. This first-workspace setup returns `409 WEDDING_ALREADY_EXISTS` if the owner already has a workspace. The server uses `title` as the wedding name, derives a unique slug, and sets the timezone to `Asia/Kolkata`. `description` is stored in the wedding's settings document. The endpoint rejects cross-site fetches and mismatched `Origin` headers.
 
 ### 6.2 List Weddings
 
@@ -359,7 +361,7 @@ Returns only weddings owned by the authenticated user.
 PATCH /api/v1/weddings/{weddingId}
 ```
 
-Only permitted wedding fields may be modified. Ownership must be verified first.
+The owner may retrieve and update only their own wedding. `GET` returns the wedding title, description, partner names, city, date, tentative-date flag, timezone, and status. `PATCH` accepts any non-empty subset of `title`, `description`, `partnerOneName`, `partnerTwoName`, `city`, `weddingDate`, and `weddingDateIsTentative`. Send `weddingDate: null` to clear the date. Ownership is verified before reading or writing; cross-site and mismatched-origin updates are rejected.
 
 ## 7. Wedding Settings APIs
 

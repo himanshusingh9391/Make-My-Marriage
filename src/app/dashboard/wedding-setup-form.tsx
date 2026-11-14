@@ -21,6 +21,8 @@ export default function WeddingSetupForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          title: form.get("title"),
+          description: form.get("description"),
           partnerOneName: form.get("partnerOneName"),
           partnerTwoName: form.get("partnerTwoName"),
           city: form.get("city"),
@@ -51,8 +53,10 @@ export default function WeddingSetupForm() {
       </div>
       <form className={styles.setupForm} onSubmit={onSubmit}>
         <div className={styles.setupGrid}>
+          <div className={styles.setupField}><label htmlFor="wedding-title">Wedding title</label><input className={styles.setupInput} id="wedding-title" name="title" required maxLength={160} placeholder="e.g. Ananya & Vikram’s Wedding" /></div>
           <div className={styles.setupField}><label htmlFor="partner-one">Bride / Partner one full name</label><input className={styles.setupInput} id="partner-one" name="partnerOneName" autoComplete="off" required maxLength={120} /></div>
           <div className={styles.setupField}><label htmlFor="partner-two">Groom / Partner two full name</label><input className={styles.setupInput} id="partner-two" name="partnerTwoName" autoComplete="off" required maxLength={120} /></div>
+          <div className={styles.setupField}><label htmlFor="wedding-description">Description</label><textarea className={styles.setupInput} id="wedding-description" name="description" maxLength={1200} rows={3} placeholder="A short note about your celebration" /></div>
           <div className={styles.setupField}><label htmlFor="wedding-city">City or place</label><input className={styles.setupInput} id="wedding-city" name="city" autoComplete="address-level2" required maxLength={120} placeholder="e.g. Jaipur" /></div>
           <div className={styles.setupField}><label htmlFor="wedding-date">Tentative wedding date</label><input className={styles.setupInput} id="wedding-date" name="weddingDate" type="date" /></div>
         </div>

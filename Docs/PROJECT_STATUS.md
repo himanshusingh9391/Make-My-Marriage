@@ -6,7 +6,7 @@ This file tracks major project milestones. Detailed requirements and architectur
 
 ## Current status
 
-The initial project foundation, responsive public homepage, owner authentication, first-workspace onboarding, and private owner dashboard are implemented. Sign-up collects only the account name, email, and password; after sign-in, the owner can add couple names, city, and a tentative wedding date on the dashboard. Couple names and the date countdown appear together in the wedding details card on desktop, tablet, and mobile. The app targets `mmm-db` by default. Atlas connectivity was verified during initialization, and the database contains all 18 documented collections and their indexes. Local development can register and sign in without Resend; production still requires email verification. Further workspace management, guest RSVPs, and photo uploads are not implemented yet.
+The initial project foundation, responsive public homepage, owner authentication, first-workspace onboarding, editable wedding details, and private owner dashboard are implemented. Sign-up collects only the account name, email, and password; after sign-in, the owner can add and edit a wedding title, description, couple names, city, and tentative wedding date on the dashboard. Signed-in owners can return to the public homepage and use its dashboard link to go back to planning. Couple names and the date countdown appear together in the wedding details card on desktop, tablet, and mobile. The app targets `mmm-db` by default. Atlas connectivity was verified during initialization, and the database contains all 18 documented collections and their indexes. Local development can register and sign in without Resend; production still requires email verification. Guest RSVPs and photo uploads are not implemented yet.
 
 ## Completed milestones
 
@@ -45,7 +45,7 @@ The initial project foundation, responsive public homepage, owner authentication
 
 ## Next milestone
 
-**PRD Phase 1:** Implement wedding workspace list/select/update and authorization, then begin events and guest management.
+**Next:** Complete multiple wedding workspace list/select/archive management and authorization, then begin events and guest management.
 
 ## Progress log
 
@@ -60,5 +60,6 @@ The initial project foundation, responsive public homepage, owner authentication
 | 2026-11-10 | Authentication flow reliability | Implemented; route smoke checks passed | Addressed the Windows Turbopack junction failure, added local-only verification bypass when Resend is absent, and routes signup to Sign In and successful sign-in to the owner dashboard. |
 | 2026-11-11 | Owner planning dashboard and logout | Implemented; route checks passed | Typecheck passed; lint had zero errors and one existing font warning. Public pages and health returned HTTP 200; signed-in logout and protected dashboard behavior were verified in the onboarding flow check. |
 | 2026-11-14 | Account signup and first wedding onboarding | Implemented | Signup accepts full name, email, and password only. Authenticated dashboard creates the first wedding workspace and shows couple names, place, date, and an India-time countdown in the same wedding card. Typecheck passed; lint had zero errors and one existing font warning; 7 unit tests passed. HTTP flow verified signup, login, workspace creation, duplicate protection, dashboard details/countdown, logout, and post-logout protection. Temporary QA records were removed. |
+| 2026-11-14 | Wedding details setup, editing, and signed-in navigation | Implemented | Added title and description to first-workspace setup and owner-scoped GET/PATCH APIs for editing title, description, partner names, city, date, and tentative-date status. Dashboard branding returns to the public homepage; signed-in homepage CTA opens the dashboard. Description is stored in `wedding_settings`; API/database/product docs and schema tests updated. 9 unit tests passed; typecheck passed; lint passed with one existing custom-font warning; production build passed. Playwright browser flow verified signup validation, registration, invalid/correct login, required setup fields, wedding create/edit/read, ownership isolation, signed-in homepage navigation, logout, and protected dashboard. Temporary QA account and wedding data were removed. |
 
 When a major feature is completed, add a concise row to this log and update the sections above to reflect the current state and next milestone.

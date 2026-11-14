@@ -2,6 +2,7 @@ import "server-only";
 import mongoose, { type Types } from "mongoose";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Wedding } from "@/features/auth/models/wedding";
+import { WeddingSettings } from "@/features/weddings/models/wedding-settings";
 
 type ExpenseTotal = {
   _id: null;
@@ -16,6 +17,8 @@ export async function getOwnerDashboard(userId: Types.ObjectId) {
     .lean();
 
   if (!wedding) return null;
+
+  const settings = await WeddingSettings.findOne({ weddingId: wedding._id }).lean();
 
   const database = mongoose.connection.db;
   if (!database) throw new Error("The MongoDB database handle is unavailable.");
@@ -36,7 +39,9 @@ export async function getOwnerDashboard(userId: Types.ObjectId) {
 
   return {
     wedding: {
+      id: wedding._id.toString(),
       name: wedding.weddingName,
+      description: settings?.description ?? "",
       partnerOneName: wedding.partnerOneName,
       partnerTwoName: wedding.partnerTwoName,
       weddingDate: wedding.weddingDate?.toISOString() ?? null,

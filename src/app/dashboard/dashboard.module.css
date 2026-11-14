@@ -77,6 +77,7 @@
 .weddingCardDetails span { display: inline-flex; align-items: center; gap: 6px; }
 .weddingCardDetails svg { color: #9da894; }
 .weddingName { margin: 13px 0 0; color: #a0a397; font-size: 10px; }
+.weddingDescription { max-width: 620px; margin: 8px 0 0; color: #7d8980; font-size: 11px; line-height: 1.65; }
 .weddingCardSeal { position: absolute; right: 18px; bottom: 17px; color: #bf8176; opacity: .74; }
 .emptyWorkspace { display: flex; gap: 16px; align-items: center; padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: #fffefa; }
 .emptyIcon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: #f6eeea; color: #bc8275; }
@@ -106,6 +107,21 @@
 .weddingCountdown { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin: -3px 0 13px; color: #78847a; font-size: 10px; }
 .weddingCountdown strong { color: #617c61; font-family: "Playfair Display", Georgia, serif; font-size: 23px; font-weight: 500; line-height: 1; }
 .weddingCountdown em { color: #a0a397; font-size: 9px; font-style: italic; }
+.detailsEditor { margin-top: 17px; }
+.detailsEditorActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.editDetailsButton,.cancelDetailsButton { min-height: 36px; padding: 0 12px; border: 1px solid #dfe5dc; border-radius: 7px; background: #fffefa; color: #586b5b; cursor: pointer; font: inherit; font-size: 10px; font-weight: 600; }
+.editDetailsButton:hover,.cancelDetailsButton:hover:not(:disabled) { border-color: #bfcdbb; background: #f4f6f0; }
+.detailsSuccess { margin: 0; color: #617c61; font-size: 10px; }
+.detailsForm { margin-top: 12px; padding: 20px; border: 1px solid #e8e9df; border-radius: 10px; background: #fbfaf7; }
+.detailsFormHeading { margin-bottom: 17px; }
+.detailsFormHeading .eyebrow { margin-bottom: 6px; }
+.detailsFormHeading h3 { margin: 0; color: #3d5043; font-family: "Playfair Display", Georgia, serif; font-size: 20px; font-weight: 500; }
+.detailsFormHeading > p:last-child { margin: 5px 0 0; color: #899087; font-size: 10px; }
+.detailsForm .setupGrid { gap: 14px; }
+.detailsForm textarea.setupInput,.setupField textarea.setupInput { min-height: 82px; padding: 10px 12px; resize: vertical; }
+.detailsPrivacy { margin: 13px 0 0; color: #92998c; font-size: 10px; }
+.detailsForm .setupActions { justify-content: flex-end; }
+.detailsForm .cancelDetailsButton:disabled { cursor: wait; opacity: .65; }
 
 .sectionHeading { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin: 37px 0 16px; }
 .sectionHeading .eyebrow { margin-bottom: 6px; }
@@ -157,6 +173,7 @@
   .weddingCardImage { min-height: 128px; }
   .weddingCardBody { padding: 20px; }
   .weddingCardBody h2 { font-size: 27px; }
+  .detailsForm { padding: 15px; }
   .weddingCardSeal { right: 14px; bottom: 14px; }
   .setupGrid { grid-template-columns: 1fr; gap: 14px; }
   .setupActions { align-items: stretch; flex-direction: column; }

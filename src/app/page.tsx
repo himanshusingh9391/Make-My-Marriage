@@ -14,6 +14,9 @@ import {
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { getSessionUser } from "@/features/auth/service";
+import { SESSION_COOKIE_NAME } from "@/features/auth/security";
 import CelebrationImage from "./celebration-image";
 import styles from "./home.module.css";
 
@@ -235,7 +238,10 @@ function splitDescription(description: string, wordLimit = 10) {
   };
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const cookieStore = await cookies();
+  const user = await getSessionUser(cookieStore.get(SESSION_COOKIE_NAME)?.value);
+
   return (
     <div className={styles.page} id="top">
       <header className={styles.header}>
@@ -253,11 +259,13 @@ export default function HomePage() {
             <a href="#photo-share">Photo Share</a>
           </nav>
           <div className={styles.headerActions}>
-            <Link className={styles.signIn} href="/sign-in">
-              Sign in
-            </Link>
-            <Link className={styles.headerButton} href="/sign-up">
-              Start Planning <ArrowRight aria-hidden="true" size={14} />
+            {!user && (
+              <Link className={styles.signIn} href="/sign-in">
+                Sign in
+              </Link>
+            )}
+            <Link className={styles.headerButton} href={user ? "/dashboard" : "/sign-up"}>
+              {user ? "Go to your dashboard" : "Start Planning"} <ArrowRight aria-hidden="true" size={14} />
             </Link>
             <details className={styles.mobileMenu}>
               <summary aria-label="Open navigation menu">

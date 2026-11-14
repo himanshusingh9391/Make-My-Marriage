@@ -18,6 +18,7 @@ import { getSessionUser } from "@/features/auth/service";
 import { getOwnerDashboard } from "@/features/dashboard/service";
 import { SESSION_COOKIE_NAME } from "@/features/auth/security";
 import SignOutButton from "./sign-out-button";
+import WeddingDetailsEditor from "./wedding-details-editor";
 import WeddingSetupForm from "./wedding-setup-form";
 import styles from "./dashboard.module.css";
 
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
   return (
     <main className={styles.dashboardPage}>
       <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/dashboard" aria-label="Make My Marriage dashboard">
+        <Link className={styles.brand} href="/" aria-label="Make My Marriage home">
           <span className={styles.brandMark}><Flower2 size={19} strokeWidth={1.7} /></span>
           <span>make my <strong>marriage</strong></span>
         </Link>
@@ -143,6 +144,17 @@ export default async function DashboardPage() {
                   <span><MapPin size={16} /> {dashboard.wedding.city}</span>
                 </p>
                 <p className={styles.weddingName}>{dashboard.wedding.name}</p>
+                {dashboard.wedding.description && <p className={styles.weddingDescription}>{dashboard.wedding.description}</p>}
+                <WeddingDetailsEditor wedding={{
+                  id: dashboard.wedding.id,
+                  title: dashboard.wedding.name,
+                  description: dashboard.wedding.description,
+                  partnerOneName: dashboard.wedding.partnerOneName,
+                  partnerTwoName: dashboard.wedding.partnerTwoName,
+                  city: dashboard.wedding.city,
+                  weddingDate: dashboard.wedding.weddingDate?.slice(0, 10) ?? null,
+                  weddingDateIsTentative: dashboard.wedding.weddingDateIsTentative,
+                }} />
               </div>
               <div className={styles.weddingCardSeal}><Heart size={18} fill="currentColor" /></div>
             </section>
