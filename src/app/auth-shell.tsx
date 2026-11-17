@@ -1,5 +1,5 @@
-import { ArrowRight, Heart, ShieldCheck, Sprout, Star } from "lucide-react";
-import Link from "next/link";
+import { ArrowRight, Heart, ShieldCheck, Star } from "lucide-react";
+import SiteLogo from "./site-logo";
 import CelebrationImage from "./celebration-image";
 import styles from "./auth.module.css";
 
@@ -41,10 +41,7 @@ export default function AuthShell({ children, mode }: AuthShellProps) {
   return (
     <main className={styles.authPage}>
       <header className={styles.authHeader}>
-        <Link className={styles.authBrand} href="/" aria-label="Make My Marriage home">
-          <Sprout aria-hidden="true" size={22} strokeWidth={1.6} />
-          <span>Make My Marriage</span>
-        </Link>
+        <SiteLogo />
       </header>
 
       <div className={styles.authLayout}>

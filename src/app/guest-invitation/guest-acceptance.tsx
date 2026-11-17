@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+import SiteLogo from "../site-logo";
 import styles from "../invitations/accept/invitation-acceptance.module.css";
 export default function GuestAcceptance({ token }: { token: string }) {
   const [pending, setPending] = useState(false);
@@ -17,7 +17,7 @@ export default function GuestAcceptance({ token }: { token: string }) {
     } catch (error) { setMessage(error instanceof Error ? error.message : "Please try again."); }
     finally { setPending(false); }
   }
-  return <main className={styles.page}><header className={styles.header}><Link href="/" className={styles.brand}>make my <strong>marriage</strong></Link></header><section className={styles.card}>
+  return <main className={styles.page}><header className={styles.header}><SiteLogo /></header><section className={styles.card}>
     <p className={styles.eyebrow}>A PLACE IN THE CELEBRATION</p><h1>{accepted ? "Invitation accepted" : "You’re invited"}</h1>
     <p className={styles.copy}>Join the celebration as a guest. No account or dashboard access is needed.</p>
     {!accepted && <button type="button" className={styles.primary} disabled={pending || !token} onClick={() => void accept()}>{pending ? "Accepting…" : "Accept invitation"}</button>}

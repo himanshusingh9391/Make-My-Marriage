@@ -18,6 +18,7 @@ import { cookies } from "next/headers";
 import { getSessionUser } from "@/features/auth/service";
 import { SESSION_COOKIE_NAME } from "@/features/auth/security";
 import CelebrationImage from "./celebration-image";
+import SiteLogo from "./site-logo";
 import styles from "./home.module.css";
 
 const photos = {
@@ -246,11 +247,7 @@ export default async function HomePage() {
     <div className={styles.page} id="top">
       <header className={styles.header}>
         <div className={styles.headerTop}>
-          <a className={styles.brand} href="#top" aria-label="Make My Marriage home">
-            <Heart aria-hidden="true" size={17} strokeWidth={1.5} />
-            <span>Make My Marriage</span>
-            <small>An Heirloom Chronicle</small>
-          </a>
+          <SiteLogo />
           <nav className={styles.navigation} aria-label="Main navigation">
             <a href="#ceremonies">Ceremonies</a>
             <a href="#moments">Moments</a>
@@ -611,7 +608,7 @@ export default async function HomePage() {
       </main>
 
       <footer className={styles.footer}>
-        <a className={styles.footerBrand} href="#top"><Heart aria-hidden="true" size={16} /> Make My Marriage</a>
+        <SiteLogo />
         <p>An intimate wedding heirloom chronicle commemorating the union of Aanya Sharma and Kabir Singhania at Zenana Mahal, Lake Pichola, Udaipur.</p>
         <nav aria-label="Footer navigation">
           <a href="#top">The Union</a><a href="#ceremonies">Ceremonies</a><a href="#moments">Moments</a><a href="#feasts">The Feasts</a><a href="#blessings">Family Blessings</a><a href="#reviews">Reviews & Ratings</a><a href="#photo-share">Photo Vault / QR</a>

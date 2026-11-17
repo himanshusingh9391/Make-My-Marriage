@@ -6,6 +6,8 @@ This file tracks major project milestones. Detailed requirements and architectur
 
 ## Current status
 
+All page headers and the homepage footer now use the shared guest-homepage logo component, with consistent responsive styling.
+
 The initial project foundation, responsive public homepage, owner authentication, first-workspace onboarding, editable wedding details, private dashboard, and first increment of wedding member invitations are implemented. Owners, Admins, and Managers can invite users as Admin or Manager through the configured Resend integration; invitations use single-use hashed tokens, seven-day expiry, invited email matching, accept/revoke flows, member visibility, and a selected-workspace landing after acceptance. Live Resend delivery has not been reverified in this review; the shared `resend.dev` testing sender only permits the Resend account recipient, while arbitrary recipients require a verified domain. Managers have the same invitation permissions as Admins. Role changes are deferred; owners can now remove Admin/Manager members and Admins and Managers can remove other Managers. Sign-up collects only the account name, email, and password; after sign-in, the owner can add and edit wedding details on the dashboard. The app targets `mmm-db` by default. The database initialization script now provisions 20 documented collections and their indexes. Local development can register and sign in without Resend; ordinary signup/login work without email verification; new accounts created through invitations must verify their email before signing in. Accountless general guest invitations are implemented; event RSVPs and photo uploads are not implemented yet.
 
 ## Completed milestones
@@ -123,3 +125,9 @@ When a major feature is completed, add a concise row to this log and update the 
 - Fresh verification: production build (including TypeScript) passed; 20 unit tests passed; lint passed with the existing custom-font warning; both production Playwright suites passed (37.5 seconds). The suite covers responsive public/account pages, signup/login, wedding setup, member/guest invitation acceptance and revocation, expiry, Manager access, removal, and logout/session invalidation. Temporary QA records were cleaned up by the suite.
 - Visually inspected fresh desktop and mobile Members screenshots. Native manual browser control was unavailable because the computer-use connection could not be opened; this was automated browser testing plus screenshot review, not a completed manual interaction pass.
 - No live email sent. Resend delivery, invited signup email verification delivery, and password-recovery delivery remain unverified. Only this progress record changed in the follow-up.
+
+### 2026-11-17 - Consistent site logo
+
+- Extracted the guest homepage heart icon, Make My Marriage wordmark, and An Heirloom Chronicle tagline into one shared SiteLogo component. Homepage header/footer, dashboard and Members sidebar, signup/login/recovery/verification headers, and member/guest invitation pages now use it. All logos link to the public homepage.
+- Shared responsive sizing follows the homepage styling, including hiding the tagline on narrow phones. Removed obsolete page-specific logo styles.
+- Verification: source inspection only; no automated tests or browser checks run for this UI change.

@@ -8,6 +8,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import SignOutButton from "./sign-out-button";
+import SiteLogo from "../site-logo";
 import styles from "./dashboard.module.css";
 
 type Props = {
@@ -33,10 +34,7 @@ export function DashboardSidebar({ fullName, workspaceId, active, accountRole, t
 
   return (
     <aside className={styles.sidebar}>
-      <Link className={styles.brand} href="/" aria-label="Make My Marriage home">
-        <span className={styles.brandMark}><Flower2 size={19} strokeWidth={1.7} /></span>
-        <span>make my <strong>marriage</strong></span>
-      </Link>
+      <SiteLogo />
       <div className={styles.workspaceLabel}>YOUR WEDDING SUITE</div>
       <nav className={styles.navigation} aria-label="Wedding suite navigation">
         <Link

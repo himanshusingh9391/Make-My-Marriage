@@ -22,9 +22,9 @@
   background: #fffefa;
 }
 
-.brand { display: flex; align-items: center; gap: 10px; padding: 0 10px; color: #34483c; text-decoration: none; font-family: "Playfair Display", Georgia, serif; font-size: 17px; letter-spacing: -.35px; }
-.brand strong { font-weight: 600; }
-.brandMark { width: 34px; height: 34px; border: 1px solid #d8e0d6; border-radius: 50%; display: grid; place-items: center; color: #526b57; }
+
+
+
 .workspaceLabel { margin: 52px 10px 15px; color: #9a9d93; font-size: 9px; font-weight: 700; letter-spacing: 1.35px; }
 .navigation { display: grid; gap: 5px; }
 .navItem { min-height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 9px; color: #727d74; font-size: 12px; font-weight: 600; }
@@ -150,14 +150,14 @@
 @media (max-width: 980px) {
   .dashboardPage { grid-template-columns: 205px minmax(0, 1fr); }
   .sidebar { padding-right: 13px; padding-left: 13px; }
-  .brand { font-size: 15px; }
+
   .statGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 680px) {
   .dashboardPage { display: block; }
   .sidebar { min-height: auto; position: static; display: block; padding: 14px 16px 9px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .brand { width: fit-content; padding: 0; }
+
   .workspaceLabel,.sidebarBottom { display: none; }
   .navigation { display: flex; gap: 5px; overflow-x: auto; margin-top: 12px; padding-bottom: 2px; scrollbar-width: none; }
   .navigation::-webkit-scrollbar { display: none; }
