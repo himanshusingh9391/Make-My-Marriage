@@ -5,14 +5,15 @@
 Make My Marriage is a wedding-planning web application. A registered user can own multiple wedding workspaces. Each workspace isolates its events, guests, invitations, RSVPs, tasks, actual expenses, vendors, public wedding website, and gallery.
 
 ## 2. Goals
-- Secure registration, email verification, login, logout, password reset.
+- Secure registration, login, logout, password reset; no email verification requirement for signup/login.
 - Create and manage multiple wedding workspaces with strict owner/data isolation.
 - Manage events and venues; guest records and event assignments; guest-specific invitation links and event RSVPs.
 - Provide planning dashboard, tasks, actual expense register, vendor directory, check-in, email invitations/reminders, public wedding site and gallery.
 - Preserve guest privacy and support responsive accessible UI.
 
 ## 3. User types
-**Wedding owner:** verified registered user, owns one or more weddings; sole owner per wedding in v2.0.
+**Wedding owner:** verified registered user who owns a wedding workspace.
+**Wedding member:** verified registered user invited to a specific wedding as an Admin or Manager.
 **Guest:** no platform account; invitation-token access to own assigned events and RSVPs, plus public/authorized gallery content.
 **Platform operator:** no product dashboard in initial release; privileged operational access is restricted and audited.
 
@@ -20,11 +21,12 @@ Make My Marriage is a wedding-planning web application. A registered user can ow
 ### In scope
 Auth; wedding workspace/details/settings; events/venues; guest CRUD and assignments; secure invitations; event-specific RSVP; dashboard; email through Resend; check-in; task planner; actual expense register; saved vendor directory with Google Places discovery; published wedding site; WhatsApp copy/share only; albums/photos with Cloudflare R2.
 ### Out of scope
-Collaborator/family roles, vendor accounts/marketplace transactions, payment processing, budget forecasting/remaining-budget calculations, WhatsApp Business API, native apps, subscription billing, AI planning, public guest registration, guest social network.
+Member role changes after joining (later increment), vendor accounts/marketplace transactions, payment processing, budget forecasting/remaining-budget calculations, WhatsApp Business API, native apps, subscription billing, AI planning, public guest registration, guest social network.
 
 ## 5. Functional requirements
-- **AUTH:** Normalize and uniquely enforce email; Argon2id password hashing; secure cookie session; session revocation; single-use time-limited hashed verification/reset tokens; rate-limit auth; verify email before publication/invitations.
+- **AUTH:** Normalize and uniquely enforce email; Argon2id password hashing; secure cookie session; session revocation; single-use time-limited hashed verification/reset tokens; rate-limit auth; signup/login work without email verification; invitations require authenticated access and matching recipient email on acceptance.
 - **WEDDING:** Create multiple workspaces; unique slug; owner reference; list/select; details update; archive lifecycle; all access checks derive owner from authenticated session.
+- **MEMBERS:** Owner, Admin, or Manager can invite an existing or new account by email as Admin or Manager. Invitations use single-use hashed tokens, expire after 7 days, are delivered through Resend, and can be revoked by an Owner, Admin, or Manager. Acceptance requires an active authenticated account with the invited normalized email. Admins and Managers have the same member and guest invitation permissions. The owner can remove Admins or Managers; Admins and Managers can remove other Managers. The owner and acting user cannot be removed through member management. Role changes are deferred.
 - **SETTINGS:** Names, date, timezone, contacts, theme (Elegant & Royal, Minimal & Modern, Traditional Indian), website publish state, description/countdown/livestream, RSVP defaults, gallery visibility, email preferences.
 - **EVENTS/VENUES:** Create/edit/cancel/delete Haldi, Mehendi, Sangeet, Wedding, Reception, custom events; start/end/timezone, venue, RSVP deadline, capacity, dress code, notes. Validate start < end. Venue may be selected via Places API.
 - **GUESTS:** Guest name; optional email/phone; family/group, notes; status; assign to multiple events. Invitation token is random and only hash stored; revoke/regenerate.
@@ -55,7 +57,7 @@ Integrity: unique slug/email, guest-event assignment and RSVP, cross-reference v
 Next.js + TypeScript; Next.js Route Handlers; Node.js; REST JSON `/api/v1`; MongoDB Atlas; Mongoose; Zod; Argon2id; secure cookie sessions; Vercel; Cloudflare R2; Resend; Google Places/Maps URLs; Vitest, integration tests, Playwright; OpenAPI.
 
 ## 9. Acceptance criteria
-Verified auth lifecycle works; users create multiple weddings; owner-only access enforced; event/guest/assignment/RSVP rules validated; dashboards correct; invitations/reminders idempotent; check-in/tasks/expenses/vendors usable; site publication privacy upheld; gallery uploads/downloads authorized; expiry/revocation enforced; automated cross-wedding security tests pass.
+Verified auth lifecycle works; users create multiple weddings; owner and authorized membership access is enforced; event/guest/assignment/RSVP rules are validated; dashboards are correct; invitations/reminders are idempotent; check-in/tasks/expenses/vendors are usable; site publication privacy is upheld; gallery uploads/downloads are authorized; expiry/revocation is enforced; automated cross-wedding security tests pass.
 
 ## 10. Release phases
 1 Auth, ownership, workspace, database, core authorization.
@@ -66,4 +68,16 @@ Verified auth lifecycle works; users create multiple weddings; owner-only access
 6 Security/performance tests, deploy, monitoring, backup restore.
 
 ## 11. Future
-Collaborators/RBAC, planner accounts, guest accounts, SMS/WhatsApp API, subscriptions, multi-currency, multilingual, advanced analytics, AI planning.
+Additional member permission levels, planner accounts, guest accounts, SMS/WhatsApp API, subscriptions, multi-currency, multilingual, advanced analytics, AI planning.
+
+### Approved update ? 2026-11-14
+
+Regular signup/login do not send or require verification email. Resend is used for member invitations from the dashboard, with existing password recovery retained. Invited users sign up/sign in and join the existing wedding; the shared dashboard lists owner and members with their roles.
+
+### Approved clarification ? 2026-11-14: invited-member verification
+
+This supersedes the earlier same-day blanket removal of signup verification. Ordinary registration still creates an ACTIVE account without email delivery. Registration from a valid invitation includes optional `nextTo` (restricted to `/invitations/accept?token=...`), validates invitation expiry/status/delivery and recipient email, creates a PENDING_VERIFICATION account, and sends a 24-hour hashed verification token. Pending accounts cannot log in before verification. The verification URL and resend flow preserve the invitation destination. After verification, sign-in accepts the invitation and redirects to its existing wedding dashboard; it creates no wedding. Role comes from the stored invitation and the shared sidebar lists owner then members. Existing active accounts can sign in and accept invitations directly. Failed verification delivery keeps the account pending with a resend option; suspended accounts remain blocked. No new collections or raw token storage are introduced.
+
+### 2026-11-16 ? Separate guest invitations and membership management
+
+Invite Member grants Admin/Manager workspace access. Send Invitation sends relatives an accountless guest acceptance link, never dashboard access. Both track pending/accepted totals. Guest acceptance records receipt/acceptance of the general invitation only, not an event RSVP or attendance count. Event assignments and RSVP remain a separate milestone. No product seat cap is imposed; individual invitations remain subject to rate limits and provider quotas.

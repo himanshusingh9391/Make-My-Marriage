@@ -47,7 +47,7 @@ https://<application-domain>/api/v1
 
 ### 2.4 Authentication
 
-Owner APIs use secure cookie-based sessions.
+Private APIs use secure cookie-based sessions. The owner retains full wedding ownership. Membership-enabled endpoints may authorize an invited Admin or Manager against the exact wedding.
 
 The session cookie must be configured with:
 
@@ -65,9 +65,9 @@ Guests use secure invitation tokens. Guest endpoints must expose only the guest'
 
 For all private wedding APIs:
 
-1. Validate the owner session.
+1. Validate the authenticated session.
 2. Obtain the authenticated user ID from the session.
-3. Verify wedding ownership.
+3. Verify wedding ownership or membership, according to the endpoint's role requirements.
 4. Use the verified wedding ID for all subsequent queries.
 5. Verify every referenced resource belongs to that wedding.
 
@@ -213,11 +213,11 @@ Rules:
 - Enforce unique normalized email.
 - Require at least 12 characters, with lowercase, uppercase, numeric, and symbol characters; maximum 128 characters.
 - Hash password using Argon2id.
-- Create verification token and store only its hash.
+- Create an ACTIVE account without sending a verification email; leave emailVerifiedAt null unless email ownership is separately confirmed.
 - Return `emailVerificationRequired` so the client can route to the correct sign-in guidance.
 - Never return password hashes or raw verification tokens in the API response.
-- If verification email delivery is unavailable, keep the account pending and allow the owner to request another link.
-- In local development only, if Resend credentials are absent, activate the account immediately and return `emailVerificationRequired: false`. Email verification remains required in production.
+- Signup and login do not depend on Resend availability.
+- Return `emailVerificationRequired: false` in every environment. Correct-password login activates legacy PENDING_VERIFICATION accounts; suspended accounts remain blocked.
 - If MongoDB cannot be reached, return a structured `503 DATABASE_UNAVAILABLE` response; do not attempt to create the account or wedding without persistence.
 
 ### 5.2 Login
@@ -362,6 +362,28 @@ PATCH /api/v1/weddings/{weddingId}
 ```
 
 The owner may retrieve and update only their own wedding. `GET` returns the wedding title, description, partner names, city, date, tentative-date flag, timezone, and status. `PATCH` accepts any non-empty subset of `title`, `description`, `partnerOneName`, `partnerTwoName`, `city`, `weddingDate`, and `weddingDateIsTentative`. Send `weddingDate: null` to clear the date. Ownership is verified before reading or writing; cross-site and mismatched-origin updates are rejected.
+
+### 6.4 Wedding Members and Invitations
+
+| Method | Endpoint | Authentication | Purpose |
+|---|---|---|---|
+| GET | `/weddings/{weddingId}/members` | Owner or member session | List active members and invitation history |
+| POST | `/weddings/{weddingId}/members` | Owner or Admin session | Create and email an invitation |
+| DELETE | `/weddings/{weddingId}/invitations/{invitationId}` | Owner or Admin session | Revoke a pending invitation |
+| POST | `/invitations/preview` | Public invitation token in JSON body | Show a safe invitation preview |
+| POST | `/invitations/accept` | Verified user session + invitation token | Join the wedding workspace |
+
+Create request:
+
+```json
+{ "email": "planner@example.com", "role": "MANAGER" }
+```
+
+`role` is `ADMIN` or `MANAGER`. Owner, Admin, and Manager can invite and revoke member and guest invitations. Role changes are deferred; removal follows the restrictions below.
+
+The server normalizes email, rejects an existing member or active duplicate invitation, creates a random single-use token, stores only its HMAC hash, and sends a seven-day acceptance link through Resend. `RESEND_FROM_EMAIL` supports `onboarding@resend.dev` for testing to the Resend account email. Other recipients require a verified domain. Invalid server email configuration returns `503 SERVER_CONFIGURATION_ERROR`. A provider test-recipient restriction returns `503 RESEND_TEST_SENDER_RESTRICTED` and revokes the failed invitation for retry. Invitation records retain `deliveryStatus` (`PENDING`, `SENT`, `FAILED`) and history. If Resend rejects delivery, the failed link is revoked, its record remains in history, and the API returns `502 INVITATION_DELIVERY_FAILED` with the safe provider error code so the Admin can diagnose it and create a replacement.
+
+Acceptance requires an active, email-verified account whose normalized email matches the invite. Wrong-email accounts receive `403 INVITATION_EMAIL_MISMATCH`; expired or revoked links are rejected; an existing membership returns `409 ALREADY_A_MEMBER`. A successful acceptance creates one unique `(weddingId,userId)` membership and redirects into that selected wedding workspace. Raw invitation tokens must not appear in logs or API list responses.
 
 ## 7. Wedding Settings APIs
 
@@ -952,3 +974,26 @@ Owner endpoints use secure cookie sessions and wedding ownership checks. Guest e
 The API enforces event-specific RSVP rules, assignment maximums, deadlines, check-in constraints, secure gallery access, email idempotency, and provider webhook verification.
 
 No Express backend, vendor marketplace, guest accounts, or WhatsApp Business API is included in the initial release.
+
+### 2026-11-14 authentication and invitation continuation
+
+Signup/login no longer require verification email. Resend sends dashboard member invitations; existing password recovery remains available. Invitation acceptance requires an active authenticated account whose normalized email matches the invitation, plus its valid single-use token. Invitation-aware sign-in accepts the invitation then opens the existing wedding workspace. No new wedding is created for invitees. Optional `nextTo` on registration/resend-verification is restricted to the internal invitation acceptance path; legacy verification links can retain that destination.
+
+### Approved clarification ? 2026-11-14: invited-member verification
+
+This supersedes the earlier same-day blanket removal of signup verification. Ordinary registration still creates an ACTIVE account without email delivery. Registration from a valid invitation includes optional `nextTo` (restricted to `/invitations/accept?token=...`), validates invitation expiry/status/delivery and recipient email, creates a PENDING_VERIFICATION account, and sends a 24-hour hashed verification token. Pending accounts cannot log in before verification. The verification URL and resend flow preserve the invitation destination. After verification, sign-in accepts the invitation and redirects to its existing wedding dashboard; it creates no wedding. Role comes from the stored invitation and the shared sidebar lists owner then members. Existing active accounts can sign in and accept invitations directly. Failed verification delivery keeps the account pending with a resend option; suspended accounts remain blocked. No new collections or raw token storage are introduced.
+
+### 2026-11-16 ? Members and guest invitation APIs
+
+- `GET /weddings/{weddingId}/members?page=1`: authenticated wedding members; adds `counts: { pending, accepted }` across all invitations and `pagination: { page, hasMore }`; invitation history uses 50 rows per page.
+- `DELETE /weddings/{weddingId}/members/{memberId}`: owner removes Admin/Manager; Admin or Manager removes another Manager. No self/owner removal. Returns `{ memberId, removed: true }`; removes only this wedding membership. Existing invitation history remains accepted and cannot restore access.
+- `GET /weddings/{weddingId}/guest-invitations?page=1`: owner/Admin only; 25 rows per page, full pending/accepted counts, guest name/email/status/sentAt/expiresAt and pagination.
+- `POST /weddings/{weddingId}/guest-invitations`: owner/Admin only; strict `{ fullName, email }`, sends a seven-day guest acceptance link. Returns 201 `{ guestId, status: "PENDING" }`. Duplicate pending/accepted invitation returns 409. Failed/revoked/expired invitations may be replaced with a fresh token. Delivery failures return 502 and retain FAILED status.
+- `DELETE /weddings/{weddingId}/guest-invitations?guestId=...`: owner/Admin only, revokes a pending invitation.
+- `POST /guest-invitations/accept`: public, strict `{ token }`. Atomically accepts a sent, pending, unexpired invitation for an available wedding. Returns only weddingName/status; repeated acceptance is idempotent. No user, session, membership, event assignment, or RSVP is created. Invalid links return 404; expired/revoked/failed links return 410.
+
+All private operations scope by weddingId; mutations check same-origin. Guest email sends are rate limited. Guest and member counts remain separate.
+
+### 2026-11-17 ? Invitation permission and concurrency clarification
+
+Owners, Admins, and Managers can send and revoke member and guest invitations within their wedding. Admins and Managers may remove other Managers; only the owner may remove Admins. Self/owner removal remains forbidden. Concurrent invitation state changes can return `409 INVITATION_CHANGED`; refresh before retrying. Member acceptance requires SENT delivery status and commits membership and acceptance atomically.

@@ -6,9 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { AuthHeading, AuthPrimaryButton, authStyles as styles } from "./auth-shell";
 
+function invitationDestination(value?: string): string | undefined {
+  return value && /^\/invitations\/accept\?token=[A-Za-z0-9_-]{32,128}$/.test(value) ? value : undefined;
+}
+
 type ApiEnvelope = {
   success?: boolean;
-  data?: { message?: string; emailVerificationRequired?: boolean };
+  data?: { message?: string; emailVerificationRequired?: boolean; weddingId?: string };
   error?: { message?: string };
 };
 
@@ -28,6 +32,7 @@ async function readApiResponse(response: Response): Promise<ApiEnvelope> {
     data: data
       ? {
           ...(typeof data.message === "string" ? { message: data.message } : {}),
+          ...(typeof data.weddingId === "string" ? { weddingId: data.weddingId } : {}),
           ...(typeof data.emailVerificationRequired === "boolean"
             ? { emailVerificationRequired: data.emailVerificationRequired }
             : {}),
@@ -102,9 +107,11 @@ function GoogleOption() {
 export function SignInForm({
   registered = false,
   verificationRequired = false,
+  nextTo,
 }: {
   registered?: boolean;
   verificationRequired?: boolean;
+  nextTo?: string;
 }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
@@ -113,7 +120,7 @@ export function SignInForm({
     registered
       ? verificationRequired
         ? "Your account was created. Verify your email before signing in."
-        : "Your account is ready. Sign in to set up your wedding."
+        : invitationDestination(nextTo) ? "Your account is ready. Sign in to join the wedding." : "Your account is ready. Sign in to set up your wedding."
       : "",
   );
   const [messageType, setMessageType] = useState<"error" | "success">(
@@ -138,7 +145,20 @@ export function SignInForm({
       });
       const payload = await readApiResponse(response);
       if (!response.ok) throw new Error(payload.error?.message ?? "We could not sign you in. Please try again.");
-      router.replace("/dashboard");
+      const destination = nextTo && nextTo.startsWith("/") && !nextTo.startsWith("//") && !nextTo.includes("\\") ? nextTo : "/dashboard";
+      const invitation = invitationDestination(destination);
+      if (invitation) {
+        const token = new URL(invitation, window.location.origin).searchParams.get("token");
+        const acceptance = await fetch("/api/v1/invitations/accept", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }),
+        });
+        const result = await readApiResponse(acceptance);
+        if (acceptance.ok && result.data?.weddingId) {
+          router.replace(`/dashboard?workspace=${encodeURIComponent(result.data.weddingId)}`);
+          return;
+        }
+      }
+      router.replace(destination);
     } catch (error) {
       setMessageType("error");
       setMessage(error instanceof Error ? error.message : "We could not sign you in. Please try again.");
@@ -173,16 +193,16 @@ export function SignInForm({
         <GoogleOption />
         {message && <p className={messageType === "error" ? styles.authError : styles.authSuccess} role="status">{message}</p>}
       </form>
-      {message === "Verify your email before signing in." && (
-        <p className={styles.authSwitch}><Link href="/resend-verification">Resend the verification email</Link></p>
+      {(verificationRequired || message === "Verify your email before signing in.") && (
+        <p className={styles.authSwitch}><Link href={invitationDestination(nextTo) ? `/resend-verification?nextTo=${encodeURIComponent(nextTo!)}` : "/resend-verification"}>Resend the verification email</Link></p>
       )}
-      <p className={styles.authSwitch}>New here? <Link href="/sign-up">Create an account</Link></p>
+      <p className={styles.authSwitch}>New here? <Link href={nextTo ? `/sign-up?nextTo=${encodeURIComponent(nextTo)}` : "/sign-up"}>Create an account</Link></p>
       <p className={styles.authPrivacy}><LockKeyhole size={14} aria-hidden="true" /> Protected account access · Your guest details stay private</p>
     </>
   );
 }
 
-export function SignUpForm() {
+export function SignUpForm({ nextTo }: { nextTo?: string }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
@@ -200,6 +220,7 @@ export function SignUpForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName: formData.get("fullName"),
+          nextTo: invitationDestination(nextTo),
           email: formData.get("email"),
           password,
         }),
@@ -207,7 +228,10 @@ export function SignUpForm() {
       const payload = await readApiResponse(response);
       if (!response.ok) throw new Error(payload.error?.message ?? "We could not create your account.");
       const verificationParam = payload.data?.emailVerificationRequired ? "&verify=1" : "";
-      router.replace(`/sign-in?registered=1${verificationParam}`);
+      const returnParam = nextTo && nextTo.startsWith("/") && !nextTo.startsWith("//") && !nextTo.includes("\\")
+        ? `&nextTo=${encodeURIComponent(nextTo)}`
+        : "";
+      router.replace(`/sign-in?registered=1${verificationParam}${returnParam}`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "We could not create your account.");
     } finally {
@@ -220,7 +244,7 @@ export function SignUpForm() {
       <AuthHeading
         eyebrow="New account"
         title="Begin your story"
-        description="Create your account first. You’ll add your wedding details after signing in."
+        description={invitationDestination(nextTo) ? "Create your account with the invited email to join the existing wedding. No wedding setup is needed." : "Create your account first. You’ll add your wedding details after signing in."}
       />
       <form className={styles.authForm} onSubmit={onSubmit}>
         <div className={styles.authField}>
@@ -235,12 +259,12 @@ export function SignUpForm() {
         <AuthPrimaryButton disabled={pending}>{pending ? "Creating your account…" : "Create account"}</AuthPrimaryButton>
         {message && <p className={styles.authError} role="status">{message}</p>}
       </form>
-      <p className={styles.authSwitch}>Already have an account? <Link href="/sign-in">Sign in</Link></p>
+      <p className={styles.authSwitch}>Already have an account? <Link href={nextTo ? `/sign-in?nextTo=${encodeURIComponent(nextTo)}` : "/sign-in"}>Sign in</Link></p>
       <p className={styles.authPrivacy}><LockKeyhole size={14} aria-hidden="true" /> Protected account access · Your guest details stay private</p>
     </>
   );
 }
-export function VerificationStatus({ token }: { token: string }) {
+export function VerificationStatus({ token, nextTo }: { token: string; nextTo?: string }) {
   const [message, setMessage] = useState(
     token ? "Verifying your email…" : "This verification link is missing its token.",
   );
@@ -275,7 +299,7 @@ export function VerificationStatus({ token }: { token: string }) {
   return (
     <div className={styles.verifyStatus}>
       <AuthHeading eyebrow="Email verification" title={success ? "Your story can begin." : "Confirming your email."} description={message} />
-      {success && <Link className={styles.authPrimaryButton} href="/sign-in"><span>Continue to sign in</span><Mail size={18} aria-hidden="true" /></Link>}
+      {success && <Link className={styles.authPrimaryButton} href={invitationDestination(nextTo) ? `/sign-in?nextTo=${encodeURIComponent(nextTo!)}` : "/sign-in"}><span>Continue to sign in</span><Mail size={18} aria-hidden="true" /></Link>}
       {!success && <Link className={styles.authTextLink} href="/sign-up">Return to sign up</Link>}
     </div>
   );
@@ -322,7 +346,7 @@ export function ForgotPasswordForm() {
   );
 }
 
-export function ResendVerificationForm() {
+export function ResendVerificationForm({ nextTo }: { nextTo?: string }) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
@@ -336,7 +360,7 @@ export function ResendVerificationForm() {
       const response = await fetch("/api/v1/auth/resend-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, nextTo: invitationDestination(nextTo) }),
       });
       const payload = await readApiResponse(response);
       if (!response.ok) throw new Error(payload.error?.message ?? "Please try again shortly.");
@@ -358,7 +382,7 @@ export function ResendVerificationForm() {
         <AuthPrimaryButton disabled={pending}>{pending ? "Sending…" : "Send verification link"}</AuthPrimaryButton>
         {message && <p className={error ? styles.authError : styles.authSuccess} role="status">{message}</p>}
       </form>
-      <p className={styles.authSwitch}><Link href="/sign-in">Return to sign in</Link></p>
+      <p className={styles.authSwitch}><Link href={invitationDestination(nextTo) ? `/sign-in?nextTo=${encodeURIComponent(nextTo!)}` : "/sign-in"}>Return to sign in</Link></p>
     </>
   );
 }

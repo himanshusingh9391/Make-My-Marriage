@@ -2,7 +2,7 @@
 **Version:** 2.0 | **Status:** Draft for review
 
 ## 1. Architecture summary
-A modular Next.js web application with server-side Route Handlers and a shared MongoDB Atlas database (configured by `MONGODB_DB_NAME`, default `mmm-db`). Multi-tenancy is logical: each wedding-owned document contains `weddingId`; authorization is verified against the session-derived user and wedding owner. Media bytes reside in private Cloudflare R2; Resend handles transactional email; Google Places supports venue/vendor discovery.
+A modular Next.js web application with server-side Route Handlers and a shared MongoDB Atlas database (configured by `MONGODB_DB_NAME`, default `mmm-db`). Multi-tenancy is logical: each wedding-owned document contains `weddingId`; authorization derives from the session user and either wedding ownership or an active wedding membership. Media bytes reside in private Cloudflare R2; Resend handles transactional email; Google Places supports venue/vendor discovery.
 
 ## 2. Architecture diagram
 ```mermaid
@@ -11,7 +11,7 @@ flowchart TB
   Web[Next.js UI - TypeScript]
   Routes[Next.js Route Handlers - REST /api/v1]
   Auth[Auth & Session Service]
-  Domain[Domain Services: Weddings, Events, Guests, RSVP, Tasks, Expenses, Vendors, Gallery]
+  Domain[Domain Services: Weddings, Memberships, Events, Guests, RSVP, Tasks, Expenses, Vendors, Gallery]
   Mongo[(MongoDB Atlas / Mongoose)]
   R2[(Cloudflare R2 - private media)]
   Resend[Resend Email API + Webhooks]
@@ -33,9 +33,9 @@ flowchart TB
 - **Next.js UI:** owner dashboard/workspace selection, guest invitation and public website views; responsive accessible frontend.
 - **Route handlers:** versioned REST, authentication middleware, Zod input validation, error normalization, pagination, rate limiting.
 - **Auth service:** Argon2id, email verification/reset, opaque session tokens, token hashing, expiry/revocation, CSRF protection, and HMAC-keyed authentication rate limits.
-- **Local development:** When Resend credentials are absent in `NODE_ENV=development`, new local accounts are activated immediately so sign-up and sign-in can be exercised. Email verification remains required outside local development.
-- **Tenant authorization:** authenticate session; fetch wedding where `_id` and `ownerUserId` match session user; use verified weddingId for downstream queries.
-- **Domain services:** business logic for event and guest assignment, RSVP deadline/capacity checks, dashboards, email, expense minor units, photo access.
+- **Account activation:** Registration creates ACTIVE users in all environments without Resend or email verification. Successful password login activates legacy pending accounts; suspended accounts remain blocked. Session authentication requires ACTIVE status.
+- **Tenant authorization:** authenticate session; verify the session user owns the wedding or has a membership for it; use verified weddingId for downstream queries. The owner, Admins, and Managers may invite or revoke member and guest invitations within their wedding.
+- **Domain services:** membership and invitation lifecycle, event and guest assignment, RSVP deadline/capacity checks, dashboards, email, expense minor units, photo access.
 - **MongoDB Atlas:** data collections and indexes, transactions where multi-document consistency is required and deployment supports them.
 - **Cloudflare R2:** private object storage, unique object keys, presigned upload/download or authorized proxy.
 - **Resend:** invitation/reminder/verification/reset mail and webhook delivery updates, processed idempotently.
@@ -51,7 +51,7 @@ flowchart TB
 7. API responds with stable JSON envelope; secrets and token values are not logged.
 
 ## 5. Data and tenancy
-Shared collections, wedding-scoped documents, `weddingId` mandatory on wedding-owned records. Owner ID comes only from verified session. Cache keys, job payloads, object keys, and aggregates must include wedding scope. Guest token grants least-privilege access to only the guest's assigned events/RSVP and permitted album content. No cross-wedding queries.
+Shared collections, wedding-scoped documents, `weddingId` mandatory on wedding-owned records. Owner and membership IDs come only from verified session and database relationships. Invitation tokens are random, single-use, seven-day tokens stored only as HMAC hashes; acceptance checks authenticated-account email equality, expiry, revocation, and duplicate membership. Cache keys, job payloads, object keys, and aggregates must include wedding scope. Guest token grants least-privilege access to only the guest's assigned events/RSVP and permitted album content. No cross-wedding queries.
 
 ## 6. Security controls
 TLS; Argon2id; HttpOnly/Secure/SameSite cookies; CSRF protection; short-lived single-use hashed reset/verification tokens; random invitation/album tokens stored hashed; authentication and RSVP rate limits; Zod validation; safe output shaping; audit logs excluding secrets; strict CORS; private R2 objects; content signature and upload limits; webhook signature verification; secrets via environment/managed configuration.
@@ -78,3 +78,11 @@ Unit tests for domain rules and Zod schemas; integration tests with database for
 - Store UTC timestamps; display wedding IANA timezone.
 - R2 contains bytes; MongoDB contains photo metadata.
 - Future collaboration should add membership and explicit RBAC, not weaken ownership guards.
+
+### Approved clarification ? 2026-11-14: invited-member verification
+
+This supersedes the earlier same-day blanket removal of signup verification. Ordinary registration still creates an ACTIVE account without email delivery. Registration from a valid invitation includes optional `nextTo` (restricted to `/invitations/accept?token=...`), validates invitation expiry/status/delivery and recipient email, creates a PENDING_VERIFICATION account, and sends a 24-hour hashed verification token. Pending accounts cannot log in before verification. The verification URL and resend flow preserve the invitation destination. After verification, sign-in accepts the invitation and redirects to its existing wedding dashboard; it creates no wedding. Role comes from the stored invitation and the shared sidebar lists owner then members. Existing active accounts can sign in and accept invitations directly. Failed verification delivery keeps the account pending with a resend option; suspended accounts remain blocked. No new collections or raw token storage are introduced.
+
+### 2026-11-16 ? Guest and member access separation
+
+The guests module owns accountless general guest invitations. It reuses owner/Admin authorization for private management, Resend for email, and hashed seven-day bearer tokens for acceptance. Public acceptance discloses no guest list, contact data, session, or dashboard authorization. General acceptance does not perform event RSVP operations. Member removal is scoped to the selected wedding and takes effect at the next authorized request.

@@ -6,12 +6,12 @@ export const metadata = { title: "Verify Your Email | Make My Marriage" };
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; nextTo?: string }>;
 }) {
-  const { token = "" } = await searchParams;
+  const { token = "", nextTo } = await searchParams;
   return (
     <AuthShell mode="verify">
-      <VerificationStatus token={token} />
+      <VerificationStatus token={token} nextTo={nextTo} />
     </AuthShell>
   );
 }

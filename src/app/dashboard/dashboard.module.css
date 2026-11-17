@@ -29,8 +29,10 @@
 .navigation { display: grid; gap: 5px; }
 .navItem { min-height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 9px; color: #727d74; font-size: 12px; font-weight: 600; }
 .navItemActive { color: #385343; background: #edf2eb; }
+.navItemLink { text-decoration: none; }
+.navItemLink:hover { color: #385343; background: #edf2eb; }
 .comingSoon { margin-left: auto; color: #a2a59b; font-size: 9px; font-weight: 500; }
-.sidebarBottom { margin-top: auto; }
+.sidebarBottom { margin-top: auto; max-height:40vh; overflow-y:auto; }
 .sidebarRule { height: 1px; margin: 15px 8px; background: var(--line); }
 .sidebarAccount { display: flex; align-items: center; gap: 10px; padding: 2px 8px; }
 .avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #e9eee7; color: #4e6852; font-size: 11px; font-weight: 700; }

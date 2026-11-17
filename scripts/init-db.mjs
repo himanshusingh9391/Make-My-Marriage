@@ -35,6 +35,17 @@ const indexes = {
     [{ slug: 1 }, { unique: true }],
   ],
   wedding_settings: [[{ weddingId: 1 }, { unique: true }]],
+  wedding_memberships: [
+    [{ weddingId: 1, userId: 1 }, { unique: true }],
+    [{ userId: 1, joinedAt: -1 }, {}],
+  ],
+  wedding_invitations: [
+    [{ tokenHash: 1 }, { unique: true }],
+    [{ weddingId: 1, normalizedEmail: 1, acceptedAt: 1, revokedAt: 1 }, {}],
+    [{ weddingId: 1, createdAt: -1 }, {}],
+    [{ expiresAt: 1 }, {}],
+    [{ activeInvitationKey: 1 }, { unique: true, sparse: true }],
+  ],
   events: [
     [{ weddingId: 1, startDate: 1 }, {}],
     [{ weddingId: 1, status: 1, startDate: 1 }, {}],
@@ -43,6 +54,7 @@ const indexes = {
   guests: [
     [{ weddingId: 1, createdAt: -1 }, {}],
     [{ invitationTokenHash: 1 }, { unique: true }],
+    [{ weddingId: 1, normalizedEmail: 1 }, { unique: true, partialFilterExpression: { normalizedEmail: { $type: "string" } } }],
   ],
   guest_events: [[{ weddingId: 1, guestId: 1, eventId: 1 }, { unique: true }]],
   rsvps: [

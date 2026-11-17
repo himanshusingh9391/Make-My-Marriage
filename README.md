@@ -46,7 +46,7 @@ npm.cmd run build
 npm.cmd run test:e2e
 ```
 
-Playwright is configured for Chromium. Install browser binaries when needed with `npx.cmd playwright install chromium`.
+Playwright is configured for Chromium. Install browser binaries with `npx.cmd playwright install chromium`. Public-page layout tests run by default. Database flow tests require explicit opt-in (`$env:RUN_DB_E2E="1"`) and use temporary QA accounts and seeded invitations, removed in a finally block. No email is sent. For stable production testing, first run `npm.cmd run build`, set `$env:E2E_PRODUCTION="1"`, and run `npm.cmd run test:e2e -- --workers=1` with port 3000 available.
 
 ## Structure
 
@@ -61,4 +61,4 @@ The existing specification files are `Docs/PRD.md`, `Docs/System_Design.md`, `Do
 
 ## Current limits and next phase
 
-The scaffold includes the landing page, health endpoint, environment validation helpers, and a lazy MongoDB connection utility. It does not implement authentication, wedding or guest management, RSVPs, email workflows, expenses, vendor discovery, gallery uploads, or dashboard business logic. The recommended next phase is **Phase 1 from the PRD**: authentication, session lifecycle, owner authorization, wedding workspace CRUD, and database models/indexes.
+The public homepage, account authentication, wedding setup/editing, dashboard, member invitations/removal, and accountless guest invitations are implemented. Admins and Managers can manage member and guest invitations within their wedding. Owner-only wedding editing and protected member-removal rules remain enforced. Live email delivery requires Resend configuration and a verified sender domain for arbitrary recipients; it is not covered by the seeded browser suite. Events, event-specific RSVPs, expenses, and photo uploads remain future milestones. See `Docs/PROJECT_STATUS.md` for verified progress.

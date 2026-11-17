@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { AppError } from "@/lib/http/app-error";
+import { resendConfigSchema } from "./resend-config-schema";
 
 const optionalSecret = z.preprocess(
   (value) =>
@@ -44,20 +45,18 @@ export function requireMongoUri(): string {
 }
 
 export function requireResendConfig() {
-  return z
-    .object({
-      apiKey: z
-        .string()
-        .trim()
-        .min(1, "RESEND_API_KEY is required to send email"),
-      fromEmail: z
-        .string()
-        .email("RESEND_FROM_EMAIL must be a valid email address"),
-    })
-    .parse({
+  const result = resendConfigSchema.safeParse({
       apiKey: environment.RESEND_API_KEY,
       fromEmail: environment.RESEND_FROM_EMAIL,
     });
+  if (!result.success) {
+    throw new AppError(
+      "Email sending is not configured correctly. Set RESEND_API_KEY and RESEND_FROM_EMAIL (for testing: onboarding@resend.dev).",
+      "SERVER_CONFIGURATION_ERROR",
+      503,
+    );
+  }
+  return result.data;
 }
 
 export function requireR2Config() {

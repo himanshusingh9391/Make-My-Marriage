@@ -19,6 +19,7 @@ import {
   REMEMBERED_SESSION_DAYS,
 } from "./security";
 import { createHmac } from "node:crypto";
+import { getInvitationPreview } from "@/features/weddings/invitations-service";
 
 const emailVerificationLifetimeMs = 24 * 60 * 60 * 1000;
 const passwordResetLifetimeMs = 60 * 60 * 1000;
@@ -85,10 +86,12 @@ async function sendVerificationEmail(
   email: string,
   partnerOneName: string,
   token: string,
+  nextTo?: string,
 ): Promise<void> {
   const client = resendClient();
   const verificationUrl = new URL("/verify-email", environment.NEXT_PUBLIC_APP_URL);
   verificationUrl.searchParams.set("token", token);
+  if (nextTo) verificationUrl.searchParams.set("nextTo", nextTo);
   let fromEmail: string;
 
   try {
@@ -113,82 +116,46 @@ async function sendVerificationEmail(
 
 export async function registerAccount(input: RegisterInput) {
   const parsed = registerSchema.parse(input);
-  const emailVerificationEnabled = environment.NODE_ENV !== "development" || Boolean(
-    environment.RESEND_API_KEY && environment.RESEND_FROM_EMAIL,
-  );
-  if (emailVerificationEnabled) resendClient();
   await connectToDatabase();
   const normalizedEmail = parsed.email.trim().toLowerCase();
-
+  if (parsed.nextTo) {
+    const token = new URL(parsed.nextTo, environment.NEXT_PUBLIC_APP_URL).searchParams.get("token")!;
+    const invitation = await getInvitationPreview(token);
+    if (invitation.status !== "PENDING" || invitation.deliveryStatus !== "SENT") {
+      throw new AppError("This invitation is no longer active. Ask the wedding admin for a new link.", "INVALID_INVITATION", 410);
+    }
+    if (invitation.email.toLowerCase() !== normalizedEmail) {
+      throw new AppError("Create your account using the email address that received this invitation.", "INVITATION_EMAIL_MISMATCH", 403);
+    }
+    requireResendConfig();
+  }
   const existingUser = await User.findOne({ normalizedEmail });
-  if (existingUser?.status === "PENDING_VERIFICATION") {
-    await resendVerificationForEmail(normalizedEmail);
-    return { message: "If this account needs verification, a new link has been sent." };
+  if (existingUser?.status === "PENDING_VERIFICATION" && parsed.nextTo) {
+    await resendVerificationForEmail(normalizedEmail, parsed.nextTo);
+    return { message: "Verify your email, then sign in to join the wedding.", emailVerificationRequired: true };
   }
   if (existingUser) {
-    throw new AppError("An account with this email already exists.", "EMAIL_ALREADY_REGISTERED", 409);
+    throw new AppError("An account with this email already exists. Sign in to continue.", "EMAIL_ALREADY_REGISTERED", 409);
   }
-
   const passwordHash = await argon2.hash(parsed.password, { type: argon2.argon2id });
-  const verificationToken = emailVerificationEnabled ? createVerificationToken() : null;
-  let user: UserDocument;
   try {
-    user = await User.create({
-      fullName: parsed.fullName,
-      email: normalizedEmail,
-      normalizedEmail,
-      passwordHash,
-      status: emailVerificationEnabled ? "PENDING_VERIFICATION" : "ACTIVE",
-      emailVerifiedAt: emailVerificationEnabled ? null : new Date(),
-    });
+    await User.create({ fullName: parsed.fullName, email: normalizedEmail, normalizedEmail, passwordHash, status: parsed.nextTo ? "PENDING_VERIFICATION" : "ACTIVE", emailVerifiedAt: null });
   } catch (error) {
     if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
       throw new AppError("An account with this email already exists.", "EMAIL_ALREADY_REGISTERED", 409);
     }
     throw error;
   }
-
-  try {
-    if (verificationToken) {
-      await EmailVerificationToken.create({
-        userId: user._id,
-        tokenHash: hashVerificationToken(verificationToken),
-        expiresAt: new Date(Date.now() + emailVerificationLifetimeMs),
-      });
-    }
-  } catch (error) {
-    await Promise.all([
-      EmailVerificationToken.deleteMany({ userId: user._id }),
-      User.deleteOne({ _id: user._id }),
-    ]);
-    if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
-      throw new AppError("An account with this email already exists.", "EMAIL_ALREADY_REGISTERED", 409);
-    }
-    throw error;
-  }
-
-  if (verificationToken) {
+  if (parsed.nextTo) {
     try {
-      await sendVerificationEmail(normalizedEmail, parsed.fullName, verificationToken);
-      return {
-        message: "Your account is ready. Verify your email, then sign in to set up your wedding.",
-        emailVerificationRequired: true,
-      };
+      await resendVerificationForEmail(normalizedEmail, parsed.nextTo);
+      return { message: "Verify your email, then sign in to join the wedding.", emailVerificationRequired: true };
     } catch {
-      logger.error("Verification email delivery failed after account creation");
-      return {
-        message: "Your account was created, but we could not send the verification email. Request a new link before signing in.",
-        emailVerificationRequired: true,
-      };
+      return { message: "Your account was created, but the verification email could not be sent. Request a new verification link before signing in.", emailVerificationRequired: true };
     }
   }
-  logger.info("Email verification skipped for local development account");
-  return {
-    message: "Your account is ready. Sign in to set up your wedding.",
-    emailVerificationRequired: false,
-  };
+  return { message: "Your account is ready. Sign in to continue.", emailVerificationRequired: false };
 }
-
 export async function verifyEmailAddress(token: string): Promise<void> {
   await connectToDatabase();
   const tokenHash = hashVerificationToken(token);
@@ -219,7 +186,7 @@ export async function verifyEmailAddress(token: string): Promise<void> {
   await user.save();
 }
 
-export async function resendVerificationForEmail(email: string): Promise<void> {
+export async function resendVerificationForEmail(email: string, nextTo?: string): Promise<void> {
   await connectToDatabase();
   const normalizedEmail = email.trim().toLowerCase();
   const user = await User.findOne({ normalizedEmail, status: "PENDING_VERIFICATION" });
@@ -236,9 +203,10 @@ export async function resendVerificationForEmail(email: string): Promise<void> {
     expiresAt: new Date(Date.now() + emailVerificationLifetimeMs),
   });
   try {
-    await sendVerificationEmail(normalizedEmail, user.fullName, token);
-  } catch {
+    await sendVerificationEmail(normalizedEmail, user.fullName, token, nextTo);
+  } catch (error) {
     logger.error("Verification email resend failed");
+    throw error;
   }
 }
 
@@ -318,7 +286,7 @@ export async function authenticateUser(
   if (user.status === "SUSPENDED") {
     throw new AppError("This account is unavailable.", "ACCOUNT_UNAVAILABLE", 403);
   }
-  if (!user.emailVerifiedAt || user.status !== "ACTIVE") {
+  if (user.status === "PENDING_VERIFICATION") {
     throw new AppError("Verify your email before signing in.", "EMAIL_NOT_VERIFIED", 403);
   }
 
@@ -354,5 +322,5 @@ export async function getSessionUser(token: string | undefined): Promise<UserDoc
   });
   if (!session) return null;
 
-  return User.findOne({ _id: session.userId, status: "ACTIVE", emailVerifiedAt: { $ne: null } });
+  return User.findOne({ _id: session.userId, status: "ACTIVE" });
 }

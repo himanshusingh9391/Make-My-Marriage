@@ -9,6 +9,7 @@ export default async function SignInPage({
   searchParams: Promise<{
     registered?: string | string[];
     verify?: string | string[];
+    nextTo?: string | string[];
   }>;
 }) {
   const params = await searchParams;
@@ -17,6 +18,7 @@ export default async function SignInPage({
       <SignInForm
         registered={params.registered === "1"}
         verificationRequired={params.verify === "1"}
+        nextTo={typeof params.nextTo === "string" ? params.nextTo : undefined}
       />
     </AuthShell>
   );
