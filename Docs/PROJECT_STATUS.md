@@ -52,7 +52,7 @@ The initial project foundation, responsive public homepage, owner authentication
 
 ## Next milestone
 
-**Next:** Verify Resend sender delivery and end-to-end member invite acceptance/revocation, then continue with multiple wedding workspace list/select/archive management before events and guest management.
+**Next:** Verify live Resend invitation and invited-account verification delivery with an approved recipient. Seeded member/guest acceptance, revocation, permissions, and responsive browser flows are verified. Confirm the next feature plan before starting implementation.
 
 ## Progress log
 
@@ -116,3 +116,10 @@ When a major feature is completed, add a concise row to this log and update the 
 - Verification: 20 unit tests passed; production build and TypeScript passed; lint has zero errors and one existing custom-font warning. Two Playwright suites passed against the production build: nine public/account pages at 320/390/768/1440px; account signup, invalid/correct login, wedding setup, dashboard widths, invitation email mismatch/acceptance/reuse/expiry/revocation, Manager controls and guest revocation, guest acceptance without dashboard access, removal and session invalidation. Reviewed tablet/mobile screenshots. Temporary QA accounts, weddings, memberships, invitations, guests and sessions were cleaned up.
 - Limits: member and guest links were seeded as sent; no live Resend email was sent. Invited-account verification email delivery and password-recovery delivery remain unverified.
 - Next: verify live invitation/verification delivery with an approved recipient, then plan the next feature.
+
+### 2026-11-17 - Follow-up regression review
+
+- Working tree was clean at the start; the feature changes were already committed and pushed as `d18cc41`. Rechecked invitation authorization, wedding isolation, hashed tokens, membership constraints, and Members page controls; no new issues identified in the reviewed areas.
+- Fresh verification: production build (including TypeScript) passed; 20 unit tests passed; lint passed with the existing custom-font warning; both production Playwright suites passed (37.5 seconds). The suite covers responsive public/account pages, signup/login, wedding setup, member/guest invitation acceptance and revocation, expiry, Manager access, removal, and logout/session invalidation. Temporary QA records were cleaned up by the suite.
+- Visually inspected fresh desktop and mobile Members screenshots. Native manual browser control was unavailable because the computer-use connection could not be opened; this was automated browser testing plus screenshot review, not a completed manual interaction pass.
+- No live email sent. Resend delivery, invited signup email verification delivery, and password-recovery delivery remain unverified. Only this progress record changed in the follow-up.
