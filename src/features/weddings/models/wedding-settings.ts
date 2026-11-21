@@ -14,9 +14,16 @@ const weddingSettingsSchema = new Schema(
   { timestamps: true, collection: "wedding_settings" },
 );
 
-export type WeddingSettingsDocument = InferSchemaType<typeof weddingSettingsSchema> & {
+export type WeddingSettingsDocument = InferSchemaType<
+  typeof weddingSettingsSchema
+> & {
   _id: mongoose.Types.ObjectId;
 };
 
-export const WeddingSettings = (mongoose.models.WeddingSettings as Model<WeddingSettingsDocument> | undefined) ??
-  mongoose.model<WeddingSettingsDocument>("WeddingSettings", weddingSettingsSchema);
+export const WeddingSettings =
+  (mongoose.models.WeddingSettings as
+    Model<WeddingSettingsDocument> | undefined) ??
+  mongoose.model<WeddingSettingsDocument>(
+    "WeddingSettings",
+    weddingSettingsSchema,
+  );

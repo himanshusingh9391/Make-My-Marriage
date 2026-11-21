@@ -9,7 +9,8 @@ export const runtime = "nodejs";
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const body: unknown = await request.json().catch(() => null);
   const input = registerSchema.parse(body);
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   await enforceAuthRateLimit("register", ip, input.email, 5);
   const data = await registerAccount(input);
   return successResponse(data, 201);

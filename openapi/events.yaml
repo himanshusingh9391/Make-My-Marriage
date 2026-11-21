@@ -1,0 +1,197 @@
+openapi: 3.1.0
+info:
+  title: Make My Marriage - Events module
+  version: 1.0.0
+  description: Wedding-scoped events for Owners, Admins and Managers. All mutations require same-origin requests. Archived workspaces are read-only.
+servers:
+  - url: /api/v1
+security:
+  - session: []
+paths:
+  /weddings/{weddingId}/events:
+    parameters:
+      - $ref: '#/components/parameters/WeddingId'
+    get:
+      operationId: listEvents
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100000, default: 1 }
+      responses:
+        '200':
+          description: Chronological page of up to 20 events, including cancelled but excluding removed events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { const: true }
+                  data:
+                    type: object
+                    required: [events, timezone, pagination]
+                    properties:
+                      events:
+                        type: array
+                        items: { $ref: '#/components/schemas/Event' }
+                      timezone: { type: string }
+                      pagination:
+                        type: object
+                        required: [page, total, hasMore]
+                        properties:
+                          page: { type: integer }
+                          total: { type: integer }
+                          hasMore: { type: boolean }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EventInput' }
+      responses:
+        '201': { $ref: '#/components/responses/Event' }
+        default: { $ref: '#/components/responses/Error' }
+  /weddings/{weddingId}/events/{eventId}:
+    parameters:
+      - $ref: '#/components/parameters/WeddingId'
+      - name: eventId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[a-fA-F0-9]{24}$' }
+    get:
+      operationId: getEvent
+      responses:
+        '200': { $ref: '#/components/responses/Event' }
+        default: { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateEvent
+      description: Submit the complete editable event with expectedUpdatedAt from the last read. Stale updates return 409 EVENT_CHANGED. Set status CANCELLED to cancel.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventInput'
+                - type: object
+                  required: [expectedUpdatedAt]
+      responses:
+        '200': { $ref: '#/components/responses/Event' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: deleteEvent
+      description: Soft-delete; preserve references while excluding the event from reads and counts.
+      responses:
+        '200':
+          description: Event removed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { const: true }
+                  data:
+                    type: object
+                    required: [eventId, removed]
+                    properties:
+                      eventId: { type: string }
+                      removed: { const: true }
+        default: { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: mmm_session
+  parameters:
+    WeddingId:
+      name: weddingId
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[a-fA-F0-9]{24}$' }
+  responses:
+    Error:
+      description: '400 invalid input or missing update version; 401 unauthenticated; 403 invalid origin; 404 inaccessible resource; 409 archived wedding or stale update; 500/503 server/database failure.'
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [success, error]
+            properties:
+              success: { const: false }
+              error:
+                type: object
+                required: [code, message, details]
+                properties:
+                  code: { type: string }
+                  message: { type: string }
+                  details: { type: array, items: {} }
+    Event:
+      description: Saved or retrieved event
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [success, data]
+            properties:
+              success: { const: true }
+              data: { $ref: '#/components/schemas/Event' }
+  schemas:
+    EventInput:
+      type: object
+      additionalProperties: false
+      required: [name, type, startDate, venue]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 150 }
+        type: { type: string, enum: [HALDI, MEHENDI, SANGEET, WEDDING, RECEPTION, CUSTOM] }
+        description: { type: string, maxLength: 2000, default: '' }
+        startDate: { type: string, format: date-time }
+        endDate:
+          type: [string, 'null']
+          format: date-time
+          default: null
+          description: Must be later than startDate when supplied.
+        venue:
+          type: object
+          additionalProperties: false
+          properties:
+            name: { type: string, maxLength: 150, default: '' }
+            address: { type: string, maxLength: 500, default: '' }
+        dressCode: { type: string, maxLength: 200, default: '' }
+        notes: { type: string, maxLength: 2000, default: '' }
+        rsvpDeadline:
+          type: [string, 'null']
+          format: date-time
+          default: null
+          description: Must not be after startDate.
+        maxAttendees: { type: [integer, 'null'], minimum: 1, maximum: 1000000, default: null }
+        status: { type: string, enum: [DRAFT, PUBLISHED, CANCELLED], default: DRAFT }
+        expectedUpdatedAt:
+          type: string
+          format: date-time
+          description: Required for PATCH. Ignored on create; never persisted.
+    Event:
+      type: object
+      required: [id, name, type, description, startDate, endDate, venue, dressCode, notes, rsvpDeadline, maxAttendees, status, timezone, updatedAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        type: { type: string, enum: [HALDI, MEHENDI, SANGEET, WEDDING, RECEPTION, CUSTOM] }
+        description: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: [string, 'null'], format: date-time }
+        venue:
+          type: object
+          properties:
+            name: { type: string }
+            address: { type: string }
+        dressCode: { type: string }
+        notes: { type: string }
+        rsvpDeadline: { type: [string, 'null'], format: date-time }
+        maxAttendees: { type: [integer, 'null'] }
+        status: { type: string, enum: [DRAFT, PUBLISHED, CANCELLED] }
+        timezone: { type: string, description: Derived from the wedding. }
+        updatedAt: { type: string, format: date-time }

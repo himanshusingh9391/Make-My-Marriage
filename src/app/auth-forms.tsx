@@ -4,15 +4,26 @@ import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
-import { AuthHeading, AuthPrimaryButton, authStyles as styles } from "./auth-shell";
+import {
+  AuthHeading,
+  AuthPrimaryButton,
+  authStyles as styles,
+} from "./auth-shell";
 
 function invitationDestination(value?: string): string | undefined {
-  return value && /^\/invitations\/accept\?token=[A-Za-z0-9_-]{32,128}$/.test(value) ? value : undefined;
+  return value &&
+    /^\/invitations\/accept\?token=[A-Za-z0-9_-]{32,128}$/.test(value)
+    ? value
+    : undefined;
 }
 
 type ApiEnvelope = {
   success?: boolean;
-  data?: { message?: string; emailVerificationRequired?: boolean; weddingId?: string };
+  data?: {
+    message?: string;
+    emailVerificationRequired?: boolean;
+    weddingId?: string;
+  };
   error?: { message?: string };
 };
 
@@ -20,25 +31,34 @@ async function readApiResponse(response: Response): Promise<ApiEnvelope> {
   const payload: unknown = await response.json().catch(() => null);
   if (typeof payload !== "object" || payload === null) return {};
   const record = payload as Record<string, unknown>;
-  const data = typeof record.data === "object" && record.data !== null
-    ? record.data as Record<string, unknown>
-    : undefined;
-  const error = typeof record.error === "object" && record.error !== null
-    ? record.error as Record<string, unknown>
-    : undefined;
+  const data =
+    typeof record.data === "object" && record.data !== null
+      ? (record.data as Record<string, unknown>)
+      : undefined;
+  const error =
+    typeof record.error === "object" && record.error !== null
+      ? (record.error as Record<string, unknown>)
+      : undefined;
 
   return {
     success: record.success === true,
     data: data
       ? {
-          ...(typeof data.message === "string" ? { message: data.message } : {}),
-          ...(typeof data.weddingId === "string" ? { weddingId: data.weddingId } : {}),
+          ...(typeof data.message === "string"
+            ? { message: data.message }
+            : {}),
+          ...(typeof data.weddingId === "string"
+            ? { weddingId: data.weddingId }
+            : {}),
           ...(typeof data.emailVerificationRequired === "boolean"
             ? { emailVerificationRequired: data.emailVerificationRequired }
             : {}),
         }
       : undefined,
-    error: typeof error?.message === "string" ? { message: error.message } : undefined,
+    error:
+      typeof error?.message === "string"
+        ? { message: error.message }
+        : undefined,
   };
 }
 
@@ -69,15 +89,29 @@ function PasswordField({
           id={id}
           name="password"
           type={visible ? "text" : "password"}
-          autoComplete={id === "new-password" ? "new-password" : "current-password"}
+          autoComplete={
+            id === "new-password" ? "new-password" : "current-password"
+          }
           value={value}
           onChange={(event) => onChange(event.target.value)}
           required
           minLength={id === "new-password" ? 12 : undefined}
           maxLength={128}
-          pattern={id === "new-password" ? "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,128}" : undefined}
-          title={id === "new-password" ? "Use at least 12 characters with lowercase, uppercase, a number, and a symbol." : undefined}
-          placeholder={id === "new-password" ? "Create a secure password" : "Enter your password"}
+          pattern={
+            id === "new-password"
+              ? "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,128}"
+              : undefined
+          }
+          title={
+            id === "new-password"
+              ? "Use at least 12 characters with lowercase, uppercase, a number, and a symbol."
+              : undefined
+          }
+          placeholder={
+            id === "new-password"
+              ? "Create a secure password"
+              : "Enter your password"
+          }
         />
         <button
           className={styles.passwordToggle}
@@ -85,7 +119,11 @@ function PasswordField({
           aria-label={visible ? "Hide password" : "Show password"}
           onClick={() => setVisible((current) => !current)}
         >
-          {visible ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+          {visible ? (
+            <EyeOff size={18} aria-hidden="true" />
+          ) : (
+            <Eye size={18} aria-hidden="true" />
+          )}
         </button>
       </div>
     </div>
@@ -95,9 +133,18 @@ function PasswordField({
 function GoogleOption() {
   return (
     <>
-      <div className={styles.authDivider}><span>Or continue with</span></div>
-      <button className={styles.authProviderButton} type="button" disabled title="Google sign-in is not configured yet">
-        <span className={styles.googleMark} aria-hidden="true">G</span>
+      <div className={styles.authDivider}>
+        <span>Or continue with</span>
+      </div>
+      <button
+        className={styles.authProviderButton}
+        type="button"
+        disabled
+        title="Google sign-in is not configured yet"
+      >
+        <span className={styles.googleMark} aria-hidden="true">
+          G
+        </span>
         Google sign-in · coming soon
       </button>
     </>
@@ -120,7 +167,9 @@ export function SignInForm({
     registered
       ? verificationRequired
         ? "Your account was created. Verify your email before signing in."
-        : invitationDestination(nextTo) ? "Your account is ready. Sign in to join the wedding." : "Your account is ready. Sign in to set up your wedding."
+        : invitationDestination(nextTo)
+          ? "Your account is ready. Sign in to join the wedding."
+          : "Your account is ready. Sign in to set up your wedding."
       : "",
   );
   const [messageType, setMessageType] = useState<"error" | "success">(
@@ -144,24 +193,45 @@ export function SignInForm({
         }),
       });
       const payload = await readApiResponse(response);
-      if (!response.ok) throw new Error(payload.error?.message ?? "We could not sign you in. Please try again.");
-      const destination = nextTo && nextTo.startsWith("/") && !nextTo.startsWith("//") && !nextTo.includes("\\") ? nextTo : "/dashboard";
+      if (!response.ok)
+        throw new Error(
+          payload.error?.message ??
+            "We could not sign you in. Please try again.",
+        );
+      const destination =
+        nextTo &&
+        nextTo.startsWith("/") &&
+        !nextTo.startsWith("//") &&
+        !nextTo.includes("\\")
+          ? nextTo
+          : "/dashboard";
       const invitation = invitationDestination(destination);
       if (invitation) {
-        const token = new URL(invitation, window.location.origin).searchParams.get("token");
+        const token = new URL(
+          invitation,
+          window.location.origin,
+        ).searchParams.get("token");
         const acceptance = await fetch("/api/v1/invitations/accept", {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }),
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
         });
         const result = await readApiResponse(acceptance);
         if (acceptance.ok && result.data?.weddingId) {
-          router.replace(`/dashboard?workspace=${encodeURIComponent(result.data.weddingId)}`);
+          router.replace(
+            `/dashboard?workspace=${encodeURIComponent(result.data.weddingId)}`,
+          );
           return;
         }
       }
       router.replace(destination);
     } catch (error) {
       setMessageType("error");
-      setMessage(error instanceof Error ? error.message : "We could not sign you in. Please try again.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "We could not sign you in. Please try again.",
+      );
     } finally {
       setPending(false);
     }
@@ -177,27 +247,80 @@ export function SignInForm({
       <form className={styles.authForm} onSubmit={onSubmit}>
         <div className={styles.authField}>
           <div className={styles.authFieldLabelRow}>
-            <label htmlFor="email">Member email</label><span>Confidential</span>
+            <label htmlFor="email">Member email</label>
+            <span>Confidential</span>
           </div>
           <div className={styles.authInputWrap}>
             <Mail size={18} aria-hidden="true" />
-            <input id="email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="couple@example.com" />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              maxLength={254}
+              placeholder="couple@example.com"
+            />
           </div>
         </div>
-        <PasswordField id="current-password" label="Vault password" value={password} onChange={setPassword} />
+        <PasswordField
+          id="current-password"
+          label="Vault password"
+          value={password}
+          onChange={setPassword}
+        />
         <div className={styles.authOptions}>
-          <label className={styles.rememberLabel}><input type="checkbox" name="rememberMe" /> <span>Remember for 30 days</span></label>
+          <label className={styles.rememberLabel}>
+            <input type="checkbox" name="rememberMe" />{" "}
+            <span>Remember for 30 days</span>
+          </label>
           <Link href="/forgot-password">Forgot password?</Link>
         </div>
-        <AuthPrimaryButton disabled={pending}>{pending ? "Signing in…" : "Access wedding suite"}</AuthPrimaryButton>
+        <AuthPrimaryButton disabled={pending}>
+          {pending ? "Signing in…" : "Access wedding suite"}
+        </AuthPrimaryButton>
         <GoogleOption />
-        {message && <p className={messageType === "error" ? styles.authError : styles.authSuccess} role="status">{message}</p>}
+        {message && (
+          <p
+            className={
+              messageType === "error" ? styles.authError : styles.authSuccess
+            }
+            role="status"
+          >
+            {message}
+          </p>
+        )}
       </form>
-      {(verificationRequired || message === "Verify your email before signing in.") && (
-        <p className={styles.authSwitch}><Link href={invitationDestination(nextTo) ? `/resend-verification?nextTo=${encodeURIComponent(nextTo!)}` : "/resend-verification"}>Resend the verification email</Link></p>
+      {(verificationRequired ||
+        message === "Verify your email before signing in.") && (
+        <p className={styles.authSwitch}>
+          <Link
+            href={
+              invitationDestination(nextTo)
+                ? `/resend-verification?nextTo=${encodeURIComponent(nextTo!)}`
+                : "/resend-verification"
+            }
+          >
+            Resend the verification email
+          </Link>
+        </p>
       )}
-      <p className={styles.authSwitch}>New here? <Link href={nextTo ? `/sign-up?nextTo=${encodeURIComponent(nextTo)}` : "/sign-up"}>Create an account</Link></p>
-      <p className={styles.authPrivacy}><LockKeyhole size={14} aria-hidden="true" /> Protected account access · Your guest details stay private</p>
+      <p className={styles.authSwitch}>
+        New here?{" "}
+        <Link
+          href={
+            nextTo
+              ? `/sign-up?nextTo=${encodeURIComponent(nextTo)}`
+              : "/sign-up"
+          }
+        >
+          Create an account
+        </Link>
+      </p>
+      <p className={styles.authPrivacy}>
+        <LockKeyhole size={14} aria-hidden="true" /> Protected account access ·
+        Your guest details stay private
+      </p>
     </>
   );
 }
@@ -226,14 +349,27 @@ export function SignUpForm({ nextTo }: { nextTo?: string }) {
         }),
       });
       const payload = await readApiResponse(response);
-      if (!response.ok) throw new Error(payload.error?.message ?? "We could not create your account.");
-      const verificationParam = payload.data?.emailVerificationRequired ? "&verify=1" : "";
-      const returnParam = nextTo && nextTo.startsWith("/") && !nextTo.startsWith("//") && !nextTo.includes("\\")
-        ? `&nextTo=${encodeURIComponent(nextTo)}`
+      if (!response.ok)
+        throw new Error(
+          payload.error?.message ?? "We could not create your account.",
+        );
+      const verificationParam = payload.data?.emailVerificationRequired
+        ? "&verify=1"
         : "";
+      const returnParam =
+        nextTo &&
+        nextTo.startsWith("/") &&
+        !nextTo.startsWith("//") &&
+        !nextTo.includes("\\")
+          ? `&nextTo=${encodeURIComponent(nextTo)}`
+          : "";
       router.replace(`/sign-in?registered=1${verificationParam}${returnParam}`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "We could not create your account.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "We could not create your account.",
+      );
     } finally {
       setPending(false);
     }
@@ -244,36 +380,100 @@ export function SignUpForm({ nextTo }: { nextTo?: string }) {
       <AuthHeading
         eyebrow="New account"
         title="Begin your story"
-        description={invitationDestination(nextTo) ? "Create your account with the invited email to join the existing wedding. No wedding setup is needed." : "Create your account first. You’ll add your wedding details after signing in."}
+        description={
+          invitationDestination(nextTo)
+            ? "Create your account with the invited email to join the existing wedding. No wedding setup is needed."
+            : "Create your account first. You’ll add your wedding details after signing in."
+        }
       />
       <form className={styles.authForm} onSubmit={onSubmit}>
         <div className={styles.authField}>
           <label htmlFor="full-name">Full name</label>
-          <div className={styles.authInputWrap}><UserRound size={17} aria-hidden="true" /><input id="full-name" name="fullName" autoComplete="name" required maxLength={120} placeholder="Your full name" /></div>
+          <div className={styles.authInputWrap}>
+            <UserRound size={17} aria-hidden="true" />
+            <input
+              id="full-name"
+              name="fullName"
+              autoComplete="name"
+              required
+              maxLength={120}
+              placeholder="Your full name"
+            />
+          </div>
         </div>
         <div className={styles.authField}>
-          <div className={styles.authFieldLabelRow}><label htmlFor="register-email">Email</label><span>Confidential</span></div>
-          <div className={styles.authInputWrap}><Mail size={17} aria-hidden="true" /><input id="register-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" /></div>
+          <div className={styles.authFieldLabelRow}>
+            <label htmlFor="register-email">Email</label>
+            <span>Confidential</span>
+          </div>
+          <div className={styles.authInputWrap}>
+            <Mail size={17} aria-hidden="true" />
+            <input
+              id="register-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              maxLength={254}
+              placeholder="you@example.com"
+            />
+          </div>
         </div>
-        <PasswordField id="new-password" label="Create vault password" hint="At least 12 characters" value={password} onChange={setPassword} />
-        <AuthPrimaryButton disabled={pending}>{pending ? "Creating your account…" : "Create account"}</AuthPrimaryButton>
-        {message && <p className={styles.authError} role="status">{message}</p>}
+        <PasswordField
+          id="new-password"
+          label="Create vault password"
+          hint="At least 12 characters"
+          value={password}
+          onChange={setPassword}
+        />
+        <AuthPrimaryButton disabled={pending}>
+          {pending ? "Creating your account…" : "Create account"}
+        </AuthPrimaryButton>
+        {message && (
+          <p className={styles.authError} role="status">
+            {message}
+          </p>
+        )}
       </form>
-      <p className={styles.authSwitch}>Already have an account? <Link href={nextTo ? `/sign-in?nextTo=${encodeURIComponent(nextTo)}` : "/sign-in"}>Sign in</Link></p>
-      <p className={styles.authPrivacy}><LockKeyhole size={14} aria-hidden="true" /> Protected account access · Your guest details stay private</p>
+      <p className={styles.authSwitch}>
+        Already have an account?{" "}
+        <Link
+          href={
+            nextTo
+              ? `/sign-in?nextTo=${encodeURIComponent(nextTo)}`
+              : "/sign-in"
+          }
+        >
+          Sign in
+        </Link>
+      </p>
+      <p className={styles.authPrivacy}>
+        <LockKeyhole size={14} aria-hidden="true" /> Protected account access ·
+        Your guest details stay private
+      </p>
     </>
   );
 }
-export function VerificationStatus({ token, nextTo }: { token: string; nextTo?: string }) {
+export function VerificationStatus({
+  token,
+  nextTo,
+}: {
+  token: string;
+  nextTo?: string;
+}) {
   const [message, setMessage] = useState(
-    token ? "Verifying your email…" : "This verification link is missing its token.",
+    token
+      ? "Verifying your email…"
+      : "This verification link is missing its token.",
   );
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     let active = true;
     if (!token) {
-      return () => { active = false; };
+      return () => {
+        active = false;
+      };
     }
 
     fetch("/api/v1/auth/verify-email", {
@@ -283,24 +483,57 @@ export function VerificationStatus({ token, nextTo }: { token: string; nextTo?: 
     })
       .then(async (response) => {
         const payload = await readApiResponse(response);
-        if (!response.ok) throw new Error(payload.error?.message ?? "This link is invalid or expired.");
+        if (!response.ok)
+          throw new Error(
+            payload.error?.message ?? "This link is invalid or expired.",
+          );
         if (active) {
           setSuccess(true);
-          setMessage(payload.data?.message ?? "Your email is verified. You can sign in now.");
+          setMessage(
+            payload.data?.message ??
+              "Your email is verified. You can sign in now.",
+          );
         }
       })
       .catch((error: unknown) => {
-        if (active) setMessage(error instanceof Error ? error.message : "Verification failed. Please try again.");
+        if (active)
+          setMessage(
+            error instanceof Error
+              ? error.message
+              : "Verification failed. Please try again.",
+          );
       });
 
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [token]);
 
   return (
     <div className={styles.verifyStatus}>
-      <AuthHeading eyebrow="Email verification" title={success ? "Your story can begin." : "Confirming your email."} description={message} />
-      {success && <Link className={styles.authPrimaryButton} href={invitationDestination(nextTo) ? `/sign-in?nextTo=${encodeURIComponent(nextTo!)}` : "/sign-in"}><span>Continue to sign in</span><Mail size={18} aria-hidden="true" /></Link>}
-      {!success && <Link className={styles.authTextLink} href="/sign-up">Return to sign up</Link>}
+      <AuthHeading
+        eyebrow="Email verification"
+        title={success ? "Your story can begin." : "Confirming your email."}
+        description={message}
+      />
+      {success && (
+        <Link
+          className={styles.authPrimaryButton}
+          href={
+            invitationDestination(nextTo)
+              ? `/sign-in?nextTo=${encodeURIComponent(nextTo!)}`
+              : "/sign-in"
+          }
+        >
+          <span>Continue to sign in</span>
+          <Mail size={18} aria-hidden="true" />
+        </Link>
+      )}
+      {!success && (
+        <Link className={styles.authTextLink} href="/sign-up">
+          Return to sign up
+        </Link>
+      )}
     </div>
   );
 }
@@ -322,12 +555,18 @@ export function ForgotPasswordForm() {
         body: JSON.stringify({ email }),
       });
       const payload = await readApiResponse(response);
-      if (!response.ok) throw new Error(payload.error?.message ?? "Please try again shortly.");
+      if (!response.ok)
+        throw new Error(payload.error?.message ?? "Please try again shortly.");
       setError(false);
-      setMessage(payload.data?.message ?? "If an account matches that email, a reset link has been sent.");
+      setMessage(
+        payload.data?.message ??
+          "If an account matches that email, a reset link has been sent.",
+      );
     } catch (issue) {
       setError(true);
-      setMessage(issue instanceof Error ? issue.message : "Please try again shortly.");
+      setMessage(
+        issue instanceof Error ? issue.message : "Please try again shortly.",
+      );
     } finally {
       setPending(false);
     }
@@ -335,13 +574,42 @@ export function ForgotPasswordForm() {
 
   return (
     <>
-      <AuthHeading eyebrow="Account recovery" title="A fresh beginning" description="Enter your account email and we’ll send a secure password reset link." />
+      <AuthHeading
+        eyebrow="Account recovery"
+        title="A fresh beginning"
+        description="Enter your account email and we’ll send a secure password reset link."
+      />
       <form className={styles.authForm} onSubmit={onSubmit}>
-        <div className={styles.authField}><label htmlFor="recovery-email">Member email</label><div className={styles.authInputWrap}><Mail size={18} aria-hidden="true" /><input id="recovery-email" name="email" type="email" required maxLength={254} autoComplete="email" placeholder="couple@example.com" /></div></div>
-        <AuthPrimaryButton disabled={pending}>{pending ? "Sending…" : "Send reset link"}</AuthPrimaryButton>
-        {message && <p className={error ? styles.authError : styles.authSuccess} role="status">{message}</p>}
+        <div className={styles.authField}>
+          <label htmlFor="recovery-email">Member email</label>
+          <div className={styles.authInputWrap}>
+            <Mail size={18} aria-hidden="true" />
+            <input
+              id="recovery-email"
+              name="email"
+              type="email"
+              required
+              maxLength={254}
+              autoComplete="email"
+              placeholder="couple@example.com"
+            />
+          </div>
+        </div>
+        <AuthPrimaryButton disabled={pending}>
+          {pending ? "Sending…" : "Send reset link"}
+        </AuthPrimaryButton>
+        {message && (
+          <p
+            className={error ? styles.authError : styles.authSuccess}
+            role="status"
+          >
+            {message}
+          </p>
+        )}
       </form>
-      <p className={styles.authSwitch}><Link href="/sign-in">Return to sign in</Link></p>
+      <p className={styles.authSwitch}>
+        <Link href="/sign-in">Return to sign in</Link>
+      </p>
     </>
   );
 }
@@ -363,12 +631,18 @@ export function ResendVerificationForm({ nextTo }: { nextTo?: string }) {
         body: JSON.stringify({ email, nextTo: invitationDestination(nextTo) }),
       });
       const payload = await readApiResponse(response);
-      if (!response.ok) throw new Error(payload.error?.message ?? "Please try again shortly.");
+      if (!response.ok)
+        throw new Error(payload.error?.message ?? "Please try again shortly.");
       setError(false);
-      setMessage(payload.data?.message ?? "If the account needs verification, a link has been sent.");
+      setMessage(
+        payload.data?.message ??
+          "If the account needs verification, a link has been sent.",
+      );
     } catch (issue) {
       setError(true);
-      setMessage(issue instanceof Error ? issue.message : "Please try again shortly.");
+      setMessage(
+        issue instanceof Error ? issue.message : "Please try again shortly.",
+      );
     } finally {
       setPending(false);
     }
@@ -376,13 +650,50 @@ export function ResendVerificationForm({ nextTo }: { nextTo?: string }) {
 
   return (
     <>
-      <AuthHeading eyebrow="Email verification" title="Check your inbox." description="Enter the email used to create your wedding suite and we’ll send a fresh verification link if it’s still needed." />
+      <AuthHeading
+        eyebrow="Email verification"
+        title="Check your inbox."
+        description="Enter the email used to create your wedding suite and we’ll send a fresh verification link if it’s still needed."
+      />
       <form className={styles.authForm} onSubmit={onSubmit}>
-        <div className={styles.authField}><label htmlFor="verification-email">Wedding email</label><div className={styles.authInputWrap}><Mail size={18} aria-hidden="true" /><input id="verification-email" name="email" type="email" required maxLength={254} autoComplete="email" placeholder="couple@example.com" /></div></div>
-        <AuthPrimaryButton disabled={pending}>{pending ? "Sending…" : "Send verification link"}</AuthPrimaryButton>
-        {message && <p className={error ? styles.authError : styles.authSuccess} role="status">{message}</p>}
+        <div className={styles.authField}>
+          <label htmlFor="verification-email">Wedding email</label>
+          <div className={styles.authInputWrap}>
+            <Mail size={18} aria-hidden="true" />
+            <input
+              id="verification-email"
+              name="email"
+              type="email"
+              required
+              maxLength={254}
+              autoComplete="email"
+              placeholder="couple@example.com"
+            />
+          </div>
+        </div>
+        <AuthPrimaryButton disabled={pending}>
+          {pending ? "Sending…" : "Send verification link"}
+        </AuthPrimaryButton>
+        {message && (
+          <p
+            className={error ? styles.authError : styles.authSuccess}
+            role="status"
+          >
+            {message}
+          </p>
+        )}
       </form>
-      <p className={styles.authSwitch}><Link href={invitationDestination(nextTo) ? `/sign-in?nextTo=${encodeURIComponent(nextTo!)}` : "/sign-in"}>Return to sign in</Link></p>
+      <p className={styles.authSwitch}>
+        <Link
+          href={
+            invitationDestination(nextTo)
+              ? `/sign-in?nextTo=${encodeURIComponent(nextTo!)}`
+              : "/sign-in"
+          }
+        >
+          Return to sign in
+        </Link>
+      </p>
     </>
   );
 }
@@ -404,13 +715,20 @@ export function ResetPasswordForm({ token }: { token: string }) {
         body: JSON.stringify({ token, password }),
       });
       const payload = await readApiResponse(response);
-      if (!response.ok) throw new Error(payload.error?.message ?? "This reset link is invalid or expired.");
+      if (!response.ok)
+        throw new Error(
+          payload.error?.message ?? "This reset link is invalid or expired.",
+        );
       setSuccess(true);
       setMessage(payload.data?.message ?? "Your password has been reset.");
       setPassword("");
     } catch (issue) {
       setSuccess(false);
-      setMessage(issue instanceof Error ? issue.message : "Password reset failed. Please try again.");
+      setMessage(
+        issue instanceof Error
+          ? issue.message
+          : "Password reset failed. Please try again.",
+      );
     } finally {
       setPending(false);
     }
@@ -418,13 +736,35 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   return (
     <>
-      <AuthHeading eyebrow="Choose a new password" title="Your suite, secured." description="Use at least 12 characters with a mix of letters, numbers and symbols." />
+      <AuthHeading
+        eyebrow="Choose a new password"
+        title="Your suite, secured."
+        description="Use at least 12 characters with a mix of letters, numbers and symbols."
+      />
       <form className={styles.authForm} onSubmit={onSubmit}>
-        <PasswordField id="new-password" label="New vault password" value={password} onChange={setPassword} />
-        <AuthPrimaryButton disabled={pending || !token}>{pending ? "Updating…" : "Reset password"}</AuthPrimaryButton>
-        {message && <p className={success ? styles.authSuccess : styles.authError} role="status">{message}</p>}
+        <PasswordField
+          id="new-password"
+          label="New vault password"
+          value={password}
+          onChange={setPassword}
+        />
+        <AuthPrimaryButton disabled={pending || !token}>
+          {pending ? "Updating…" : "Reset password"}
+        </AuthPrimaryButton>
+        {message && (
+          <p
+            className={success ? styles.authSuccess : styles.authError}
+            role="status"
+          >
+            {message}
+          </p>
+        )}
       </form>
-      {success && <p className={styles.authSwitch}><Link href="/sign-in">Continue to sign in</Link></p>}
+      {success && (
+        <p className={styles.authSwitch}>
+          <Link href="/sign-in">Continue to sign in</Link>
+        </p>
+      )}
     </>
   );
 }

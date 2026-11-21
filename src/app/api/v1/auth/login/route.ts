@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
-import { authenticateUser, enforceAuthRateLimit } from "@/features/auth/service";
+import {
+  authenticateUser,
+  enforceAuthRateLimit,
+} from "@/features/auth/service";
 import { loginSchema } from "@/features/auth/schemas";
 import { SESSION_COOKIE_NAME } from "@/features/auth/security";
 import { AppError } from "@/lib/http/app-error";
@@ -12,7 +15,8 @@ export const runtime = "nodejs";
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const body: unknown = await request.json().catch(() => null);
   const input = loginSchema.parse(body);
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   await enforceAuthRateLimit("login", ip, input.email);
   const result = await authenticateUser(input);
   const response = successResponse({
@@ -24,7 +28,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   });
 
   if (!environment.SESSION_SECRET) {
-    throw new AppError("Session security is not configured.", "SERVER_CONFIGURATION_ERROR", 503);
+    throw new AppError(
+      "Session security is not configured.",
+      "SERVER_CONFIGURATION_ERROR",
+      503,
+    );
   }
 
   response.cookies.set(SESSION_COOKIE_NAME, result.token, {

@@ -28,7 +28,11 @@ const oneDayMs = 24 * 60 * 60 * 1000;
 function getClientKey(ip: string, email: string): string {
   const secret = environment.RATE_LIMIT_SECRET;
   if (!secret) {
-    throw new AppError("Authentication security is not configured.", "SERVER_CONFIGURATION_ERROR", 503);
+    throw new AppError(
+      "Authentication security is not configured.",
+      "SERVER_CONFIGURATION_ERROR",
+      503,
+    );
   }
 
   return createHmac("sha256", secret)
@@ -55,7 +59,10 @@ export async function enforceAuthRateLimit(
     ).lean();
   } catch (error) {
     const duplicate =
-      typeof error === "object" && error !== null && "code" in error && error.code === 11000;
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000;
     if (!duplicate) throw error;
     entry = await RateLimitEntry.findOneAndUpdate(
       { keyHash },
@@ -65,7 +72,11 @@ export async function enforceAuthRateLimit(
   }
 
   if (entry && entry.attempts > maxAttempts) {
-    throw new AppError("Too many attempts. Please try again in a few minutes.", "RATE_LIMITED", 429);
+    throw new AppError(
+      "Too many attempts. Please try again in a few minutes.",
+      "RATE_LIMITED",
+      429,
+    );
   }
 }
 
@@ -89,7 +100,10 @@ async function sendVerificationEmail(
   nextTo?: string,
 ): Promise<void> {
   const client = resendClient();
-  const verificationUrl = new URL("/verify-email", environment.NEXT_PUBLIC_APP_URL);
+  const verificationUrl = new URL(
+    "/verify-email",
+    environment.NEXT_PUBLIC_APP_URL,
+  );
   verificationUrl.searchParams.set("token", token);
   if (nextTo) verificationUrl.searchParams.set("nextTo", nextTo);
   let fromEmail: string;
@@ -97,7 +111,11 @@ async function sendVerificationEmail(
   try {
     fromEmail = requireResendConfig().fromEmail;
   } catch {
-    throw new AppError("Email verification is not configured yet.", "EMAIL_SERVICE_UNAVAILABLE", 503);
+    throw new AppError(
+      "Email verification is not configured yet.",
+      "EMAIL_SERVICE_UNAVAILABLE",
+      503,
+    );
   }
 
   const { error } = await client.emails.send({
@@ -110,7 +128,11 @@ async function sendVerificationEmail(
 
   if (error) {
     logger.error("Verification email delivery failed");
-    throw new AppError("We could not send the verification email. Please try again.", "EMAIL_DELIVERY_FAILED", 502);
+    throw new AppError(
+      "We could not send the verification email. Please try again.",
+      "EMAIL_DELIVERY_FAILED",
+      502,
+    );
   }
 }
 
@@ -119,66 +141,132 @@ export async function registerAccount(input: RegisterInput) {
   await connectToDatabase();
   const normalizedEmail = parsed.email.trim().toLowerCase();
   if (parsed.nextTo) {
-    const token = new URL(parsed.nextTo, environment.NEXT_PUBLIC_APP_URL).searchParams.get("token")!;
+    const token = new URL(
+      parsed.nextTo,
+      environment.NEXT_PUBLIC_APP_URL,
+    ).searchParams.get("token")!;
     const invitation = await getInvitationPreview(token);
-    if (invitation.status !== "PENDING" || invitation.deliveryStatus !== "SENT") {
-      throw new AppError("This invitation is no longer active. Ask the wedding admin for a new link.", "INVALID_INVITATION", 410);
+    if (
+      invitation.status !== "PENDING" ||
+      invitation.deliveryStatus !== "SENT"
+    ) {
+      throw new AppError(
+        "This invitation is no longer active. Ask the wedding admin for a new link.",
+        "INVALID_INVITATION",
+        410,
+      );
     }
     if (invitation.email.toLowerCase() !== normalizedEmail) {
-      throw new AppError("Create your account using the email address that received this invitation.", "INVITATION_EMAIL_MISMATCH", 403);
+      throw new AppError(
+        "Create your account using the email address that received this invitation.",
+        "INVITATION_EMAIL_MISMATCH",
+        403,
+      );
     }
     requireResendConfig();
   }
   const existingUser = await User.findOne({ normalizedEmail });
   if (existingUser?.status === "PENDING_VERIFICATION" && parsed.nextTo) {
     await resendVerificationForEmail(normalizedEmail, parsed.nextTo);
-    return { message: "Verify your email, then sign in to join the wedding.", emailVerificationRequired: true };
+    return {
+      message: "Verify your email, then sign in to join the wedding.",
+      emailVerificationRequired: true,
+    };
   }
   if (existingUser) {
-    throw new AppError("An account with this email already exists. Sign in to continue.", "EMAIL_ALREADY_REGISTERED", 409);
+    throw new AppError(
+      "An account with this email already exists. Sign in to continue.",
+      "EMAIL_ALREADY_REGISTERED",
+      409,
+    );
   }
-  const passwordHash = await argon2.hash(parsed.password, { type: argon2.argon2id });
+  const passwordHash = await argon2.hash(parsed.password, {
+    type: argon2.argon2id,
+  });
   try {
-    await User.create({ fullName: parsed.fullName, email: normalizedEmail, normalizedEmail, passwordHash, status: parsed.nextTo ? "PENDING_VERIFICATION" : "ACTIVE", emailVerifiedAt: null });
+    await User.create({
+      fullName: parsed.fullName,
+      email: normalizedEmail,
+      normalizedEmail,
+      passwordHash,
+      status: parsed.nextTo ? "PENDING_VERIFICATION" : "ACTIVE",
+      emailVerifiedAt: null,
+    });
   } catch (error) {
-    if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
-      throw new AppError("An account with this email already exists.", "EMAIL_ALREADY_REGISTERED", 409);
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    ) {
+      throw new AppError(
+        "An account with this email already exists.",
+        "EMAIL_ALREADY_REGISTERED",
+        409,
+      );
     }
     throw error;
   }
   if (parsed.nextTo) {
     try {
       await resendVerificationForEmail(normalizedEmail, parsed.nextTo);
-      return { message: "Verify your email, then sign in to join the wedding.", emailVerificationRequired: true };
+      return {
+        message: "Verify your email, then sign in to join the wedding.",
+        emailVerificationRequired: true,
+      };
     } catch {
-      return { message: "Your account was created, but the verification email could not be sent. Request a new verification link before signing in.", emailVerificationRequired: true };
+      return {
+        message:
+          "Your account was created, but the verification email could not be sent. Request a new verification link before signing in.",
+        emailVerificationRequired: true,
+      };
     }
   }
-  return { message: "Your account is ready. Sign in to continue.", emailVerificationRequired: false };
+  return {
+    message: "Your account is ready. Sign in to continue.",
+    emailVerificationRequired: false,
+  };
 }
 export async function verifyEmailAddress(token: string): Promise<void> {
   await connectToDatabase();
   const tokenHash = hashVerificationToken(token);
-  const verification = await EmailVerificationToken.findOneAndUpdate({
-    tokenHash,
-    usedAt: null,
-    expiresAt: { $gt: new Date() },
-  }, { $set: { usedAt: new Date() } }, { returnDocument: "after" });
+  const verification = await EmailVerificationToken.findOneAndUpdate(
+    {
+      tokenHash,
+      usedAt: null,
+      expiresAt: { $gt: new Date() },
+    },
+    { $set: { usedAt: new Date() } },
+    { returnDocument: "after" },
+  );
 
   if (!verification) {
-    const previouslyUsed = await EmailVerificationToken.findOne({ tokenHash }).lean();
+    const previouslyUsed = await EmailVerificationToken.findOne({
+      tokenHash,
+    }).lean();
     if (
       previouslyUsed?.usedAt &&
-      await User.exists({ _id: previouslyUsed.userId, emailVerifiedAt: { $ne: null } })
+      (await User.exists({
+        _id: previouslyUsed.userId,
+        emailVerifiedAt: { $ne: null },
+      }))
     ) {
       return;
     }
-    throw new AppError("This verification link is invalid or expired.", "INVALID_VERIFICATION_TOKEN", 400);
+    throw new AppError(
+      "This verification link is invalid or expired.",
+      "INVALID_VERIFICATION_TOKEN",
+      400,
+    );
   }
 
   const user = await User.findById(verification.userId);
   if (!user || user.status === "SUSPENDED") {
-    throw new AppError("This verification link is invalid or expired.", "INVALID_VERIFICATION_TOKEN", 400);
+    throw new AppError(
+      "This verification link is invalid or expired.",
+      "INVALID_VERIFICATION_TOKEN",
+      400,
+    );
   }
 
   user.emailVerifiedAt = new Date();
@@ -186,10 +274,16 @@ export async function verifyEmailAddress(token: string): Promise<void> {
   await user.save();
 }
 
-export async function resendVerificationForEmail(email: string, nextTo?: string): Promise<void> {
+export async function resendVerificationForEmail(
+  email: string,
+  nextTo?: string,
+): Promise<void> {
   await connectToDatabase();
   const normalizedEmail = email.trim().toLowerCase();
-  const user = await User.findOne({ normalizedEmail, status: "PENDING_VERIFICATION" });
+  const user = await User.findOne({
+    normalizedEmail,
+    status: "PENDING_VERIFICATION",
+  });
   if (!user) return;
 
   const token = createVerificationToken();
@@ -230,7 +324,10 @@ export async function requestPasswordReset(email: string): Promise<void> {
   try {
     const client = resendClient();
     const config = requireResendConfig();
-    const resetUrl = new URL("/reset-password", environment.NEXT_PUBLIC_APP_URL);
+    const resetUrl = new URL(
+      "/reset-password",
+      environment.NEXT_PUBLIC_APP_URL,
+    );
     resetUrl.searchParams.set("token", token);
     const { error } = await client.emails.send({
       from: config.fromEmail,
@@ -245,7 +342,10 @@ export async function requestPasswordReset(email: string): Promise<void> {
   }
 }
 
-export async function resetPassword(token: string, password: string): Promise<void> {
+export async function resetPassword(
+  token: string,
+  password: string,
+): Promise<void> {
   await connectToDatabase();
   const resetToken = await PasswordResetToken.findOneAndUpdate(
     {
@@ -257,7 +357,11 @@ export async function resetPassword(token: string, password: string): Promise<vo
     { returnDocument: "after" },
   );
   if (!resetToken) {
-    throw new AppError("This password link is invalid or expired.", "INVALID_RESET_TOKEN", 400);
+    throw new AppError(
+      "This password link is invalid or expired.",
+      "INVALID_RESET_TOKEN",
+      400,
+    );
   }
 
   const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
@@ -281,13 +385,25 @@ export async function authenticateUser(
     : false;
 
   if (!user || !passwordMatches) {
-    throw new AppError("Email or password is incorrect.", "INVALID_CREDENTIALS", 401);
+    throw new AppError(
+      "Email or password is incorrect.",
+      "INVALID_CREDENTIALS",
+      401,
+    );
   }
   if (user.status === "SUSPENDED") {
-    throw new AppError("This account is unavailable.", "ACCOUNT_UNAVAILABLE", 403);
+    throw new AppError(
+      "This account is unavailable.",
+      "ACCOUNT_UNAVAILABLE",
+      403,
+    );
   }
   if (user.status === "PENDING_VERIFICATION") {
-    throw new AppError("Verify your email before signing in.", "EMAIL_NOT_VERIFIED", 403);
+    throw new AppError(
+      "Verify your email before signing in.",
+      "EMAIL_NOT_VERIFIED",
+      403,
+    );
   }
 
   const token = createSessionToken();
@@ -312,7 +428,9 @@ export async function revokeSession(token: string | undefined): Promise<void> {
   );
 }
 
-export async function getSessionUser(token: string | undefined): Promise<UserDocument | null> {
+export async function getSessionUser(
+  token: string | undefined,
+): Promise<UserDocument | null> {
   if (!token) return null;
   await connectToDatabase();
   const session = await UserSession.findOne({

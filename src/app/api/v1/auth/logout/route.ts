@@ -7,7 +7,10 @@ export const runtime = "nodejs";
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   await revokeSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
-  const response = NextResponse.json({ success: true, data: { message: "Signed out." } });
+  const response = NextResponse.json({
+    success: true,
+    data: { message: "Signed out." },
+  });
   response.cookies.set(SESSION_COOKIE_NAME, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

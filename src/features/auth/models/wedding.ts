@@ -10,8 +10,18 @@ const weddingSchema = new Schema(
     },
     weddingName: { type: String, required: true, trim: true, maxlength: 160 },
     slug: { type: String, required: true, unique: true, index: true },
-    partnerOneName: { type: String, required: true, trim: true, maxlength: 120 },
-    partnerTwoName: { type: String, required: true, trim: true, maxlength: 120 },
+    partnerOneName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
+    partnerTwoName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
     weddingDate: { type: Date, default: null },
     weddingDateIsTentative: { type: Boolean, default: true, required: true },
     city: { type: String, required: true, trim: true, maxlength: 120 },
@@ -30,5 +40,6 @@ export type WeddingDocument = InferSchemaType<typeof weddingSchema> & {
   _id: mongoose.Types.ObjectId;
 };
 
-export const Wedding = (mongoose.models.Wedding as Model<WeddingDocument> | undefined) ??
+export const Wedding =
+  (mongoose.models.Wedding as Model<WeddingDocument> | undefined) ??
   mongoose.model<WeddingDocument>("Wedding", weddingSchema);

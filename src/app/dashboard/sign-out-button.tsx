@@ -15,22 +15,36 @@ export default function SignOutButton() {
     setError("");
     try {
       const response = await fetch("/api/v1/auth/logout", { method: "POST" });
-      if (!response.ok) throw new Error("We couldn’t sign you out. Please try again.");
+      if (!response.ok)
+        throw new Error("We couldn’t sign you out. Please try again.");
       router.replace("/sign-in");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "We couldn’t sign you out. Please try again.");
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "We couldn’t sign you out. Please try again.",
+      );
       setPending(false);
     }
   }
 
   return (
     <div className={styles.signOutWrap}>
-      <button className={styles.signOutButton} type="button" onClick={signOut} disabled={pending}>
+      <button
+        className={styles.signOutButton}
+        type="button"
+        onClick={signOut}
+        disabled={pending}
+      >
         <LogOut size={16} aria-hidden="true" />
         <span>{pending ? "Signing out…" : "Log out"}</span>
       </button>
-      {error && <span className={styles.signOutError} role="status">{error}</span>}
+      {error && (
+        <span className={styles.signOutError} role="status">
+          {error}
+        </span>
+      )}
     </div>
   );
 }

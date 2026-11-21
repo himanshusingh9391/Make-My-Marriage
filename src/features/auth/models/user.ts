@@ -4,7 +4,12 @@ const userSchema = new Schema(
   {
     fullName: { type: String, required: true, trim: true, maxlength: 120 },
     email: { type: String, required: true, trim: true, lowercase: true },
-    normalizedEmail: { type: String, required: true, unique: true, index: true },
+    normalizedEmail: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
     passwordHash: { type: String, required: true },
     status: {
       type: String,
@@ -22,5 +27,6 @@ export type UserDocument = InferSchemaType<typeof userSchema> & {
   _id: mongoose.Types.ObjectId;
 };
 
-export const User = (mongoose.models.User as Model<UserDocument> | undefined) ??
+export const User =
+  (mongoose.models.User as Model<UserDocument> | undefined) ??
   mongoose.model<UserDocument>("User", userSchema);

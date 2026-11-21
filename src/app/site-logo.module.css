@@ -15,8 +15,12 @@
   text-decoration: none;
 }
 
-.logo > svg { color: #bb755e; }
-.logo > span { white-space: nowrap; }
+.logo > svg {
+  color: #bb755e;
+}
+.logo > span {
+  white-space: nowrap;
+}
 .logo small {
   grid-column: 2;
   margin-top: 4px;
@@ -24,18 +28,31 @@
   font-family: "Plus Jakarta Sans", Arial, sans-serif;
   font-size: 8px;
   font-weight: 500;
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.logo:focus-visible { outline: 2px solid #bb755e; outline-offset: 5px; border-radius: 2px; }
+.logo:focus-visible {
+  outline: 2px solid #bb755e;
+  outline-offset: 5px;
+  border-radius: 2px;
+}
 
 @media (max-width: 760px) {
-  .logo { font-size: 14px; }
-  .logo small { font-size: 7px; }
+  .logo {
+    font-size: 14px;
+  }
+  .logo small {
+    font-size: 7px;
+  }
 }
 @media (max-width: 560px) {
-  .logo { column-gap: 4px; font-size: 13px; }
+  .logo {
+    column-gap: 4px;
+    font-size: 13px;
+  }
 }
 @media (max-width: 420px) {
-  .logo small { display: none; }
+  .logo small {
+    display: none;
+  }
 }

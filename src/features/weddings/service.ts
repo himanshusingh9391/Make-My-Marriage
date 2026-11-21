@@ -13,12 +13,19 @@ import {
 } from "./schemas";
 import type { Types } from "mongoose";
 
-export async function createInitialWedding(ownerUserId: Types.ObjectId, input: CreateWeddingInput) {
+export async function createInitialWedding(
+  ownerUserId: Types.ObjectId,
+  input: CreateWeddingInput,
+) {
   const parsed = createWeddingSchema.parse(input);
   await connectToDatabase();
 
   if (await Wedding.exists({ ownerUserId, status: { $ne: "DELETED" } })) {
-    throw new AppError("Your wedding workspace has already been set up.", "WEDDING_ALREADY_EXISTS", 409);
+    throw new AppError(
+      "Your wedding workspace has already been set up.",
+      "WEDDING_ALREADY_EXISTS",
+      409,
+    );
   }
 
   const wedding = await Wedding.create({
@@ -27,15 +34,22 @@ export async function createInitialWedding(ownerUserId: Types.ObjectId, input: C
     slug: createWeddingSlug(parsed.title),
     partnerOneName: parsed.partnerOneName,
     partnerTwoName: parsed.partnerTwoName,
-    weddingDate: parsed.weddingDate ? new Date(`${parsed.weddingDate}T00:00:00.000Z`) : null,
-    weddingDateIsTentative: parsed.weddingDate ? parsed.weddingDateIsTentative : false,
+    weddingDate: parsed.weddingDate
+      ? new Date(`${parsed.weddingDate}T00:00:00.000Z`)
+      : null,
+    weddingDateIsTentative: parsed.weddingDate
+      ? parsed.weddingDateIsTentative
+      : false,
     city: parsed.city,
     timezone: "Asia/Kolkata",
     status: "ACTIVE",
   });
 
   try {
-    await WeddingSettings.create({ weddingId: wedding._id, description: parsed.description });
+    await WeddingSettings.create({
+      weddingId: wedding._id,
+      description: parsed.description,
+    });
   } catch (error) {
     await Wedding.deleteOne({ _id: wedding._id, ownerUserId });
     throw error;
@@ -48,9 +62,16 @@ export async function createInitialWedding(ownerUserId: Types.ObjectId, input: C
   };
 }
 
-export async function getWeddingDetails(ownerUserId: Types.ObjectId, weddingId: string) {
+export async function getWeddingDetails(
+  ownerUserId: Types.ObjectId,
+  weddingId: string,
+) {
   if (!mongoose.isValidObjectId(weddingId)) {
-    throw new AppError("Wedding workspace not found.", "WEDDING_NOT_FOUND", 404);
+    throw new AppError(
+      "Wedding workspace not found.",
+      "WEDDING_NOT_FOUND",
+      404,
+    );
   }
   await connectToDatabase();
   const wedding = await Wedding.findOne({
@@ -58,9 +79,16 @@ export async function getWeddingDetails(ownerUserId: Types.ObjectId, weddingId: 
     ownerUserId,
     status: { $ne: "DELETED" },
   }).lean();
-  if (!wedding) throw new AppError("Wedding workspace not found.", "WEDDING_NOT_FOUND", 404);
+  if (!wedding)
+    throw new AppError(
+      "Wedding workspace not found.",
+      "WEDDING_NOT_FOUND",
+      404,
+    );
 
-  const settings = await WeddingSettings.findOne({ weddingId: wedding._id }).lean();
+  const settings = await WeddingSettings.findOne({
+    weddingId: wedding._id,
+  }).lean();
   return {
     weddingId: wedding._id.toString(),
     title: wedding.weddingName,
@@ -69,7 +97,8 @@ export async function getWeddingDetails(ownerUserId: Types.ObjectId, weddingId: 
     partnerTwoName: wedding.partnerTwoName,
     city: wedding.city,
     weddingDate: wedding.weddingDate?.toISOString().slice(0, 10) ?? null,
-    weddingDateIsTentative: wedding.weddingDateIsTentative ?? Boolean(wedding.weddingDate),
+    weddingDateIsTentative:
+      wedding.weddingDateIsTentative ?? Boolean(wedding.weddingDate),
     timezone: wedding.timezone,
     status: wedding.status,
   };
@@ -82,7 +111,11 @@ export async function updateWeddingDetails(
 ) {
   const parsed = updateWeddingSchema.parse(input);
   if (!mongoose.isValidObjectId(weddingId)) {
-    throw new AppError("Wedding workspace not found.", "WEDDING_NOT_FOUND", 404);
+    throw new AppError(
+      "Wedding workspace not found.",
+      "WEDDING_NOT_FOUND",
+      404,
+    );
   }
   await connectToDatabase();
   const weddingUpdates: {
@@ -94,11 +127,15 @@ export async function updateWeddingDetails(
     weddingDateIsTentative?: boolean;
   } = {};
   if (parsed.title !== undefined) weddingUpdates.weddingName = parsed.title;
-  if (parsed.partnerOneName !== undefined) weddingUpdates.partnerOneName = parsed.partnerOneName;
-  if (parsed.partnerTwoName !== undefined) weddingUpdates.partnerTwoName = parsed.partnerTwoName;
+  if (parsed.partnerOneName !== undefined)
+    weddingUpdates.partnerOneName = parsed.partnerOneName;
+  if (parsed.partnerTwoName !== undefined)
+    weddingUpdates.partnerTwoName = parsed.partnerTwoName;
   if (parsed.city !== undefined) weddingUpdates.city = parsed.city;
   if (parsed.weddingDate !== undefined) {
-    weddingUpdates.weddingDate = parsed.weddingDate ? new Date(`${parsed.weddingDate}T00:00:00.000Z`) : null;
+    weddingUpdates.weddingDate = parsed.weddingDate
+      ? new Date(`${parsed.weddingDate}T00:00:00.000Z`)
+      : null;
   }
   if (parsed.weddingDateIsTentative !== undefined) {
     weddingUpdates.weddingDateIsTentative = parsed.weddingDateIsTentative;
@@ -109,7 +146,12 @@ export async function updateWeddingDetails(
     ownerUserId,
     status: { $ne: "DELETED" },
   });
-  if (!wedding) throw new AppError("Wedding workspace not found.", "WEDDING_NOT_FOUND", 404);
+  if (!wedding)
+    throw new AppError(
+      "Wedding workspace not found.",
+      "WEDDING_NOT_FOUND",
+      404,
+    );
 
   if (Object.keys(weddingUpdates).length > 0) {
     await Wedding.updateOne(
@@ -123,7 +165,12 @@ export async function updateWeddingDetails(
     await WeddingSettings.findOneAndUpdate(
       { weddingId: wedding._id },
       { $set: { description: parsed.description } },
-      { upsert: true, returnDocument: "after", runValidators: true, setDefaultsOnInsert: true },
+      {
+        upsert: true,
+        returnDocument: "after",
+        runValidators: true,
+        setDefaultsOnInsert: true,
+      },
     );
   }
 

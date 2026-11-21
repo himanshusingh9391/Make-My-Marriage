@@ -9,8 +9,11 @@ export const runtime = "nodejs";
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const body: unknown = await request.json().catch(() => null);
   const input = passwordResetSchema.parse(body);
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   await enforceAuthRateLimit("reset-password", ip, input.token, 5);
   await resetPassword(input.token, input.password);
-  return successResponse({ message: "Password reset. You can sign in with your new password." });
+  return successResponse({
+    message: "Password reset. You can sign in with your new password.",
+  });
 });

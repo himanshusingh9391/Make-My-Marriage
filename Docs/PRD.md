@@ -68,7 +68,20 @@ Verified auth lifecycle works; users create multiple weddings; owner and authori
 6 Security/performance tests, deploy, monitoring, backup restore.
 
 ## 11. Future
+
+### 2026-11-19 - Wedding tasks increment
+
+Owners, Admins, and Managers can create, view, edit, change status, and remove tasks in their wedding. The responsive task list has All Tasks, My Tasks (assigned to the signed-in user), Completed, and status/priority/event/member filters. Add task opens a separate page and returns to the task list after saving. Task fields are title, description, optional active member assignment, optional related event, optional due date, priority, status, and optional category/private notes. Only current active wedding members and non-cancelled/non-deleted events can be newly assigned. General/unassigned tasks are supported. Event cards link to their filtered task list.
+
+Due dates are calendar dates in the wedding timezone; unfinished tasks become overdue the day after their due date. Completion sets a server timestamp; reopening clears it. Archived weddings are read-only, and removed tasks disappear from lists/counts. Existing references to removed members or events remain visible for context and can be cleared or reassigned. This increment does not send task notification emails.
 Additional member permission levels, planner accounts, guest accounts, SMS/WhatsApp API, subscriptions, multi-currency, multilingual, advanced analytics, AI planning.
+
+### 2026-11-18 - Events implementation increment
+
+- Owners, Admins, and Managers can list, create, edit, cancel, and remove events in their wedding. Archived weddings are read-only.
+- The reference-based form includes event name/type, description, required start date/time, optional end date/time, venue name/address, and dress code. Both end fields may be empty; otherwise end must follow start. Overnight events use an explicit following-day end date.
+- Optional planning settings retain status, private notes, capacity, and RSVP deadline from the specification. Event-specific assignments/RSVP enforcement, public event publishing, and Places venue search remain later increments; setting PUBLISHED does not publish the wedding website or send emails.
+- Wedding timezone is authoritative; timestamps are stored in UTC. Removal retains a soft-deleted record for future history/reference integrity. Removed events are hidden; cancelled events remain visible with their status and do not count as planned events.
 
 ### Approved update ? 2026-11-14
 
@@ -81,3 +94,15 @@ This supersedes the earlier same-day blanket removal of signup verification. Ord
 ### 2026-11-16 ? Separate guest invitations and membership management
 
 Invite Member grants Admin/Manager workspace access. Send Invitation sends relatives an accountless guest acceptance link, never dashboard access. Both track pending/accepted totals. Guest acceptance records receipt/acceptance of the general invitation only, not an event RSVP or attendance count. Event assignments and RSVP remain a separate milestone. No product seat cap is imposed; individual invitations remain subject to rate limits and provider quotas.
+
+
+### Guest management increment ? 2026-11-19
+
+The Guests screen supports individual/family records, optional contact details, private notes, a maximum party size including the named guest, and selection of wedding events. It includes an empty state, search/event/RSVP filters, a paginated desktop table that stacks into mobile cards, separate add/details/edit pages, and confirmed removal. Owners, Admins, and Managers have the same guest-planning access. Saving a guest does not send an invitation; sending stays on Members. Public event RSVP submission and event-specific capacity editing remain future increments.
+
+
+### Personal invitation and RSVP increment - 2026-11-21
+
+Guests open a personal /invite/{token} link without signing up or logging in. The reference-based responsive page shows couple details, celebration image, the guest's itinerary, pending/confirmed/declined response summary, Formal RSVP, attendee count including the named guest, optional message, and an update-response action. One response for all open events is the default when their existing responses match; guests can choose different responses for individual events. Closed events remain visible but cannot be changed.
+
+The guest-details screen provides create/copy/preview/WhatsApp share, regenerate, and revoke actions for Owners/Admins/Managers. Each link grants access only to that guest's invitation; it is not a public guest registration link. The Invitations & RSVP screen and dashboard show per-event attendance totals. Guest confirmation is immediate; open team dashboards/guest lists refresh approximately every five seconds, and other open invitation views refresh every fifteen seconds when not editing. Existing fonts/colors/logo are reused. Sharing outside the local computer requires deployment and a public NEXT_PUBLIC_APP_URL.

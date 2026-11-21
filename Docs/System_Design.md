@@ -68,6 +68,10 @@ TLS; Argon2id; HttpOnly/Secure/SameSite cookies; CSRF protection; short-lived si
 Use pagination and bounded query results; weddingId-leading compound indexes; optimized RSVP aggregation; idempotency for webhooks/reminders; retry transient provider failures with bounded backoff; maintain status for async email/media actions. Scale Next.js serverless/API and MongoDB Atlas independently. Avoid claiming specific SLA until operational targets are approved.
 
 ## 9. Testing strategy
+
+Tasks use `src/features/tasks` for contracts, models, assignment validation, scoped persistence, filters/counts, and due-date rules. Events and Tasks share the wedding planning authorization guard and cookie/origin request helper. Server pages load workspace context and render reusable planning form sections/fields/headings; task create/edit uses one form component and list rows use a shared row component. Updates compare expectedUpdatedAt with persisted updatedAt to prevent stale writes. Cross-wedding event/assignee references are rejected. Soft deletion preserves historical references; read queries exclude deletedAt records.
+
+Events are implemented in `src/features/events` with Zod contracts, timezone conversion helpers, a server-only Mongoose model, and service-layer authorization. Route handlers authenticate cookie sessions, enforce same-origin mutations, and delegate to the service. Dashboard pages reuse the shared navigation shell. Updates include an expected timestamp to detect concurrent edits. Event removal is a wedding-scoped soft delete, preserving references without exposing removed events. The event form uses wedding-local wall-clock inputs converted to UTC, independent of the browser timezone.
 Unit tests for domain rules and Zod schemas; integration tests with database for tenant filters, uniqueness and RSVP; API auth and token lifecycle tests; Playwright owner/guest flows; security tests for IDOR/cross-wedding access, CSRF, rate limits, file upload validation, webhook replay; backup restore drill.
 
 ## 10. Architecture decisions
@@ -86,3 +90,15 @@ This supersedes the earlier same-day blanket removal of signup verification. Ord
 ### 2026-11-16 ? Guest and member access separation
 
 The guests module owns accountless general guest invitations. It reuses owner/Admin authorization for private management, Resend for email, and hashed seven-day bearer tokens for acceptance. Public acceptance discloses no guest list, contact data, session, or dashboard authorization. General acceptance does not perform event RSVP operations. Member removal is scoped to the selected wedding and takes effect at the next authorized request.
+
+
+### Guest management implementation ? 2026-11-19
+
+Guest UI reuses PlanningWorkspace, PlanningHeading, PlanningSection, and PlanningField. Shared server authorization and session/origin guards protect CRUD Route Handlers. features/guests/service.ts owns guest validation, wedding-scoped queries, RSVP summaries, and transactional guest/assignment writes; features/guests/model.ts is shared with existing invitation delivery. MongoDB access remains server-only. The form retains existing branding, uses a desktop planning summary and stacked mobile layout, and guards unsaved changes. Guest-list queries paginate 25 records and filter before pagination.
+
+
+### RSVP module and automatic updates - 2026-11-21
+
+features/rsvp owns token resolution, scoped invitation DTOs, transactional RSVP writes, capacity/deadline rules, and team summaries. Private link routes reuse shared session/origin/tenant authorization. Public invitation routes authorize using a hashed, expiring guest token only, with rate limits and same-origin write checks. No browser MongoDB connection, new dependency, guest user account, or membership is introduced.
+
+The public page uses a reference-based client presentation and reusable response controls. Saves replace its display with the committed server response. Team pages use a shared LiveRsvpRefresh component with visible-tab polling and focus/BroadcastChannel refresh. Guest polling pauses during form editing. This is automatic polling, not a WebSocket or push guarantee; update timing depends on network availability. REST response/data contracts are documented in API_Design.md and openapi/rsvp.json.

@@ -8,7 +8,9 @@ import { withErrorHandling } from "@/lib/http/with-error-handling";
 export const runtime = "nodejs";
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
-  const user = await getSessionUser(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  const user = await getSessionUser(
+    request.cookies.get(SESSION_COOKIE_NAME)?.value,
+  );
   if (!user) throw new AppError("Sign in to continue.", "UNAUTHENTICATED", 401);
   return successResponse({
     user: {

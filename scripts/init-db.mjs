@@ -13,6 +13,7 @@ if (!uri || (!uri.startsWith("mongodb://") && !uri.startsWith("mongodb+srv://"))
 }
 
 const indexes = {
+  shared_rsvp_links: [[{ tokenHash: 1 }, { unique: true }], [{ expiresAt: 1 }, { expireAfterSeconds: 0 }]],
   users: [[{ normalizedEmail: 1 }, { unique: true }]],
   user_sessions: [
     [{ sessionTokenHash: 1 }, { unique: true }],
@@ -52,6 +53,8 @@ const indexes = {
     [{ "venue.location": "2dsphere" }, {}],
   ],
   guests: [
+    [{ weddingId: 1, householdKey: 1 }, { unique: true, partialFilterExpression: { householdKey: { $type: "string" } } }],
+    [{ rsvpTokenHash: 1 }, { unique: true, partialFilterExpression: { rsvpTokenHash: { $type: "string" } } }],
     [{ weddingId: 1, createdAt: -1 }, {}],
     [{ invitationTokenHash: 1 }, { unique: true }],
     [{ weddingId: 1, normalizedEmail: 1 }, { unique: true, partialFilterExpression: { normalizedEmail: { $type: "string" } } }],
@@ -61,7 +64,11 @@ const indexes = {
     [{ weddingId: 1, guestId: 1, eventId: 1 }, { unique: true }],
     [{ weddingId: 1, eventId: 1, status: 1 }, {}],
   ],
-  tasks: [[{ weddingId: 1, status: 1, dueDate: 1 }, {}]],
+  tasks: [
+    [{ weddingId: 1, status: 1, dueDate: 1 }, {}],
+    [{ weddingId: 1, assignedUserId: 1, dueDate: 1 }, {}],
+    [{ weddingId: 1, eventId: 1, dueDate: 1 }, {}],
+  ],
   expenses: [[{ weddingId: 1, expenseDate: -1 }, {}]],
   vendors: [[{ weddingId: 1, category: 1, name: 1 }, {}]],
   albums: [[{ weddingId: 1, createdAt: -1 }, {}]],

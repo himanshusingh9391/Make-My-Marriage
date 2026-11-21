@@ -1,0 +1,170 @@
+openapi: 3.1.0
+info:
+  title: Make My Marriage - Tasks
+  version: 1.0.0
+  description: Private wedding tasks for Owners, Admins and Managers. Mutations require same-origin requests. Archived weddings are read-only.
+servers:
+  - url: /api/v1
+security:
+  - session: []
+paths:
+  /weddings/{weddingId}/tasks:
+    parameters:
+      - $ref: '#/components/parameters/WeddingId'
+    get:
+      operationId: listTasks
+      parameters:
+        - { name: tab, in: query, schema: { type: string, enum: [all, mine, completed], default: all } }
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/Status' } }
+        - { name: priority, in: query, schema: { $ref: '#/components/schemas/Priority' } }
+        - { name: eventId, in: query, schema: { type: string, pattern: '^([a-fA-F0-9]{24}|general)$' } }
+        - { name: assignedUserId, in: query, schema: { type: string, pattern: '^([a-fA-F0-9]{24}|unassigned)$' } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, maximum: 100000, default: 1 } }
+      responses:
+        '200':
+          description: Up to 25 tasks sorted by dueDate, createdAt descending, and ID. Tab counts are independent of filters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { const: true }
+                  data:
+                    type: object
+                    properties:
+                      tasks: { type: array, items: { $ref: '#/components/schemas/Task' } }
+                      counts:
+                        type: object
+                        properties:
+                          all: { type: integer }
+                          mine: { type: integer }
+                          completed: { type: integer }
+                      pagination:
+                        type: object
+                        properties:
+                          page: { type: integer }
+                          total: { type: integer }
+                          hasMore: { type: boolean }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Fields'
+                - type: object
+                  required: [title]
+              unevaluatedProperties: false
+      responses:
+        '201': { $ref: '#/components/responses/Task' }
+        default: { $ref: '#/components/responses/Error' }
+  /weddings/{weddingId}/tasks/{taskId}:
+    parameters:
+      - $ref: '#/components/parameters/WeddingId'
+      - name: taskId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[a-fA-F0-9]{24}$' }
+    get:
+      operationId: getTask
+      responses:
+        '200': { $ref: '#/components/responses/Task' }
+        default: { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateTask
+      description: Supply at least one editable field plus expectedUpdatedAt. Stale changes return 409 TASK_CHANGED. Status-only updates are supported.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Fields'
+                - type: object
+                  required: [expectedUpdatedAt]
+                  properties:
+                    expectedUpdatedAt: { type: string, format: date-time }
+              minProperties: 2
+              unevaluatedProperties: false
+      responses:
+        '200': { $ref: '#/components/responses/Task' }
+        default: { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: deleteTask
+      responses:
+        '200':
+          description: Soft-deleted task, excluded from lists and counts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { const: true }
+                  data:
+                    type: object
+                    properties:
+                      taskId: { type: string }
+                      removed: { const: true }
+        default: { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    session: { type: apiKey, in: cookie, name: mmm_session }
+  parameters:
+    WeddingId:
+      name: weddingId
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[a-fA-F0-9]{24}$' }
+  schemas:
+    Status: { type: string, enum: [TODO, IN_PROGRESS, COMPLETED, CANCELLED] }
+    Priority: { type: string, enum: [LOW, MEDIUM, HIGH, URGENT] }
+    Fields:
+      type: object
+      properties:
+        title: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        assignedUserId: { type: [string, 'null'], pattern: '^[a-fA-F0-9]{24}$' }
+        eventId: { type: [string, 'null'], pattern: '^[a-fA-F0-9]{24}$' }
+        dueDate: { type: [string, 'null'], format: date, description: Calendar date in wedding timezone. }
+        priority: { $ref: '#/components/schemas/Priority' }
+        status: { $ref: '#/components/schemas/Status' }
+        category: { type: string, maxLength: 100 }
+        notes: { type: string, maxLength: 2000 }
+    Task:
+      allOf:
+        - $ref: '#/components/schemas/Fields'
+        - type: object
+          properties:
+            id: { type: string }
+            updatedAt: { type: string, format: date-time }
+            completedAt: { type: [string, 'null'], format: date-time }
+            overdue: { type: boolean }
+            memberName: { type: string }
+            eventName: { type: string }
+  responses:
+    Task:
+      description: Task view
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success: { const: true }
+              data: { $ref: '#/components/schemas/Task' }
+    Error:
+      description: 400 invalid input or assignment; 401 unauthenticated; 403 invalid origin; 404 inaccessible resource; 409 archived wedding or stale update; 500/503 server error.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success: { const: false }
+              error:
+                type: object
+                properties:
+                  code: { type: string }
+                  message: { type: string }
+                  details: { type: array, items: {} }

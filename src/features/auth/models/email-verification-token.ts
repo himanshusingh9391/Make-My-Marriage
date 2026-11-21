@@ -2,7 +2,12 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
 const emailVerificationTokenSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     tokenHash: { type: String, required: true, unique: true },
     expiresAt: { type: Date, required: true },
     usedAt: { type: Date, default: null },
@@ -18,8 +23,8 @@ export type EmailVerificationTokenDocument = InferSchemaType<
 
 export const EmailVerificationToken =
   (mongoose.models.EmailVerificationToken as
-    | Model<EmailVerificationTokenDocument>
-    | undefined) ?? mongoose.model<EmailVerificationTokenDocument>(
+    Model<EmailVerificationTokenDocument> | undefined) ??
+  mongoose.model<EmailVerificationTokenDocument>(
     "EmailVerificationToken",
     emailVerificationTokenSchema,
   );

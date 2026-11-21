@@ -12,11 +12,20 @@ export const runtime = "nodejs";
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const origin = request.headers.get("origin");
   const fetchSite = request.headers.get("sec-fetch-site");
-  if ((origin && origin !== request.nextUrl.origin) || fetchSite === "cross-site") {
-    throw new AppError("This request could not be verified.", "CSRF_VALIDATION_FAILED", 403);
+  if (
+    (origin && origin !== request.nextUrl.origin) ||
+    fetchSite === "cross-site"
+  ) {
+    throw new AppError(
+      "This request could not be verified.",
+      "CSRF_VALIDATION_FAILED",
+      403,
+    );
   }
 
-  const user = await getSessionUser(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  const user = await getSessionUser(
+    request.cookies.get(SESSION_COOKIE_NAME)?.value,
+  );
   if (!user) throw new AppError("Sign in to continue.", "UNAUTHENTICATED", 401);
   const body: unknown = await request.json().catch(() => null);
   const input = createWeddingSchema.parse(body);

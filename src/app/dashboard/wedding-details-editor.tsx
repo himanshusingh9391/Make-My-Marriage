@@ -17,7 +17,11 @@ type WeddingDetails = {
 
 type ApiResult = { success?: boolean; error?: { message?: string } };
 
-export default function WeddingDetailsEditor({ wedding }: { wedding: WeddingDetails }) {
+export default function WeddingDetailsEditor({
+  wedding,
+}: {
+  wedding: WeddingDetails;
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [pending, setPending] = useState(false);
@@ -46,15 +50,25 @@ export default function WeddingDetailsEditor({ wedding }: { wedding: WeddingDeta
         }),
       });
       const payload: unknown = await response.json().catch(() => null);
-      const result = typeof payload === "object" && payload !== null ? payload as ApiResult : {};
+      const result =
+        typeof payload === "object" && payload !== null
+          ? (payload as ApiResult)
+          : {};
       if (!response.ok || result.success !== true) {
-        throw new Error(result.error?.message ?? "We could not save your wedding details. Please try again.");
+        throw new Error(
+          result.error?.message ??
+            "We could not save your wedding details. Please try again.",
+        );
       }
       setEditing(false);
       setSuccess(true);
       router.refresh();
     } catch (issue) {
-      setError(issue instanceof Error ? issue.message : "We could not save your wedding details. Please try again.");
+      setError(
+        issue instanceof Error
+          ? issue.message
+          : "We could not save your wedding details. Please try again.",
+      );
     } finally {
       setPending(false);
     }
@@ -64,8 +78,19 @@ export default function WeddingDetailsEditor({ wedding }: { wedding: WeddingDeta
     <div className={styles.detailsEditor}>
       {!editing ? (
         <div className={styles.detailsEditorActions}>
-          {success && <p className={styles.detailsSuccess} role="status">Wedding details updated.</p>}
-          <button className={styles.editDetailsButton} type="button" onClick={() => { setSuccess(false); setEditing(true); }}>
+          {success && (
+            <p className={styles.detailsSuccess} role="status">
+              Wedding details updated.
+            </p>
+          )}
+          <button
+            className={styles.editDetailsButton}
+            type="button"
+            onClick={() => {
+              setSuccess(false);
+              setEditing(true);
+            }}
+          >
             Edit wedding details
           </button>
         </div>
@@ -77,20 +102,112 @@ export default function WeddingDetailsEditor({ wedding }: { wedding: WeddingDeta
             <p>Changes are saved to this wedding workspace.</p>
           </div>
           <div className={styles.setupGrid}>
-            <div className={styles.setupField}><label htmlFor="edit-title">Wedding title</label><input className={styles.setupInput} id="edit-title" name="title" defaultValue={wedding.title} required maxLength={160} /></div>
-            <div className={styles.setupField}><label htmlFor="edit-partner-one">Bride / Partner one full name</label><input className={styles.setupInput} id="edit-partner-one" name="partnerOneName" defaultValue={wedding.partnerOneName} required maxLength={120} /></div>
-            <div className={styles.setupField}><label htmlFor="edit-partner-two">Groom / Partner two full name</label><input className={styles.setupInput} id="edit-partner-two" name="partnerTwoName" defaultValue={wedding.partnerTwoName} required maxLength={120} /></div>
-            <div className={styles.setupField}><label htmlFor="edit-city">City or place</label><input className={styles.setupInput} id="edit-city" name="city" defaultValue={wedding.city} required maxLength={120} /></div>
-            <div className={styles.setupField}><label htmlFor="edit-date">Wedding date</label><input className={styles.setupInput} id="edit-date" name="weddingDate" type="date" defaultValue={wedding.weddingDate ?? ""} /></div>
-            <div className={styles.setupField}><label htmlFor="edit-description">Description</label><textarea className={styles.setupInput} id="edit-description" name="description" defaultValue={wedding.description} maxLength={1200} rows={3} /></div>
+            <div className={styles.setupField}>
+              <label htmlFor="edit-title">Wedding title</label>
+              <input
+                className={styles.setupInput}
+                id="edit-title"
+                name="title"
+                defaultValue={wedding.title}
+                required
+                maxLength={160}
+              />
+            </div>
+            <div className={styles.setupField}>
+              <label htmlFor="edit-partner-one">
+                Bride / Partner one full name
+              </label>
+              <input
+                className={styles.setupInput}
+                id="edit-partner-one"
+                name="partnerOneName"
+                defaultValue={wedding.partnerOneName}
+                required
+                maxLength={120}
+              />
+            </div>
+            <div className={styles.setupField}>
+              <label htmlFor="edit-partner-two">
+                Groom / Partner two full name
+              </label>
+              <input
+                className={styles.setupInput}
+                id="edit-partner-two"
+                name="partnerTwoName"
+                defaultValue={wedding.partnerTwoName}
+                required
+                maxLength={120}
+              />
+            </div>
+            <div className={styles.setupField}>
+              <label htmlFor="edit-city">City or place</label>
+              <input
+                className={styles.setupInput}
+                id="edit-city"
+                name="city"
+                defaultValue={wedding.city}
+                required
+                maxLength={120}
+              />
+            </div>
+            <div className={styles.setupField}>
+              <label htmlFor="edit-date">Wedding date</label>
+              <input
+                className={styles.setupInput}
+                id="edit-date"
+                name="weddingDate"
+                type="date"
+                defaultValue={wedding.weddingDate ?? ""}
+              />
+            </div>
+            <div className={styles.setupField}>
+              <label htmlFor="edit-description">Description</label>
+              <textarea
+                className={styles.setupInput}
+                id="edit-description"
+                name="description"
+                defaultValue={wedding.description}
+                maxLength={1200}
+                rows={3}
+              />
+            </div>
           </div>
-          <label className={styles.setupTentative}><input type="checkbox" name="weddingDateIsTentative" defaultChecked={wedding.weddingDateIsTentative} /><span>This date is tentative</span></label>
-          <p className={styles.detailsPrivacy}>Your wedding details are private to your account.</p>
+          <label className={styles.setupTentative}>
+            <input
+              type="checkbox"
+              name="weddingDateIsTentative"
+              defaultChecked={wedding.weddingDateIsTentative}
+            />
+            <span>This date is tentative</span>
+          </label>
+          <p className={styles.detailsPrivacy}>
+            Your wedding details are private to your account.
+          </p>
           <div className={styles.setupActions}>
-            <button className={styles.cancelDetailsButton} type="button" disabled={pending} onClick={() => { setError(""); setEditing(false); }}>Cancel</button>
-            <button className={styles.setupButton} type="submit" disabled={pending}>{pending ? "Saving changes…" : "Save changes"}</button>
+            <button
+              className={styles.cancelDetailsButton}
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setError("");
+                setEditing(false);
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className={styles.setupButton}
+              type="submit"
+              disabled={pending}
+            >
+              {pending ? "Saving changes…" : "Save changes"}
+            </button>
           </div>
-          {error && <p className={styles.setupError} role="alert">{error}</p>}
+          {error && (
+            <p className={styles.setupError} role="alert">
+              {error}
+            </p>
+          )}
         </form>
       )}
     </div>

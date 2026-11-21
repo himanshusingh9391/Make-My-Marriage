@@ -1,4 +1,5 @@
 # Make My Marriage
+
 ## API Design Document
 
 **Version:** 2.0  
@@ -37,13 +38,13 @@ https://<application-domain>/api/v1
 
 ### 2.3 HTTP Methods
 
-| Method | Use |
-|---|---|
-| GET | Retrieve resources |
-| POST | Create resources or trigger actions |
-| PUT | Replace or upsert a resource where documented |
-| PATCH | Partially update a resource |
-| DELETE | Delete or initiate controlled deletion |
+| Method | Use                                           |
+| ------ | --------------------------------------------- |
+| GET    | Retrieve resources                            |
+| POST   | Create resources or trigger actions           |
+| PUT    | Replace or upsert a resource where documented |
+| PATCH  | Partially update a resource                   |
+| DELETE | Delete or initiate controlled deletion        |
 
 ### 2.4 Authentication
 
@@ -116,24 +117,24 @@ A client-provided `weddingId`, `guestId`, `eventId`, or other identifier is not 
 
 ### 3.4 Common HTTP Status Codes
 
-| Status | Meaning |
-|---|---|
-| 200 | Successful request |
-| 201 | Resource created |
-| 202 | Accepted for asynchronous processing |
-| 204 | Successful request with no response body |
-| 400 | Invalid request |
-| 401 | Unauthenticated |
-| 403 | Authenticated but not permitted |
-| 404 | Resource not found |
-| 409 | Conflict or duplicate |
-| 413 | Payload too large |
-| 415 | Unsupported media type |
-| 422 | Business rule validation failure |
-| 429 | Rate limit exceeded |
-| 503 | A required service is unavailable |
-| 500 | Internal server error |
-| 502 | External provider failure |
+| Status | Meaning                                  |
+| ------ | ---------------------------------------- |
+| 200    | Successful request                       |
+| 201    | Resource created                         |
+| 202    | Accepted for asynchronous processing     |
+| 204    | Successful request with no response body |
+| 400    | Invalid request                          |
+| 401    | Unauthenticated                          |
+| 403    | Authenticated but not permitted          |
+| 404    | Resource not found                       |
+| 409    | Conflict or duplicate                    |
+| 413    | Payload too large                        |
+| 415    | Unsupported media type                   |
+| 422    | Business rule validation failure         |
+| 429    | Rate limit exceeded                      |
+| 503    | A required service is unavailable        |
+| 500    | Internal server error                    |
+| 502    | External provider failure                |
 
 The implementation may return 404 for inaccessible tenant resources to avoid disclosing their existence.
 
@@ -167,16 +168,16 @@ Rules:
 
 All paths below are relative to `/api/v1`.
 
-| Method | Endpoint | Authentication | Purpose |
-|---|---|---|---|
-| POST | `/auth/register` | Public | Register user |
-| POST | `/auth/login` | Public | Authenticate |
-| POST | `/auth/logout` | Owner session | End current session |
-| GET | `/auth/me` | Owner session | Current user |
-| POST | `/auth/verify-email` | Verification token | Verify email |
-| POST | `/auth/resend-verification` | Public/session | Resend verification |
-| POST | `/auth/forgot-password` | Public | Request password reset |
-| POST | `/auth/reset-password` | Reset token | Set new password |
+| Method | Endpoint                    | Authentication     | Purpose                |
+| ------ | --------------------------- | ------------------ | ---------------------- |
+| POST   | `/auth/register`            | Public             | Register user          |
+| POST   | `/auth/login`               | Public             | Authenticate           |
+| POST   | `/auth/logout`              | Owner session      | End current session    |
+| GET    | `/auth/me`                  | Owner session      | Current user           |
+| POST   | `/auth/verify-email`        | Verification token | Verify email           |
+| POST   | `/auth/resend-verification` | Public/session     | Resend verification    |
+| POST   | `/auth/forgot-password`     | Public             | Request password reset |
+| POST   | `/auth/reset-password`      | Reset token        | Set new password       |
 
 ### 5.1 Register
 
@@ -302,15 +303,15 @@ Rules:
 
 ## 6. Wedding APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/weddings` | Create the owner's first wedding workspace |
-| GET | `/weddings` | List owned weddings |
-| GET | `/weddings/{weddingId}` | Get wedding |
-| PATCH | `/weddings/{weddingId}` | Update wedding |
-| POST | `/weddings/{weddingId}/archive` | Archive wedding |
-| POST | `/weddings/{weddingId}/restore` | Restore if permitted |
-| DELETE | `/weddings/{weddingId}` | Start controlled deletion |
+| Method | Endpoint                        | Purpose                                    |
+| ------ | ------------------------------- | ------------------------------------------ |
+| POST   | `/weddings`                     | Create the owner's first wedding workspace |
+| GET    | `/weddings`                     | List owned weddings                        |
+| GET    | `/weddings/{weddingId}`         | Get wedding                                |
+| PATCH  | `/weddings/{weddingId}`         | Update wedding                             |
+| POST   | `/weddings/{weddingId}/archive` | Archive wedding                            |
+| POST   | `/weddings/{weddingId}/restore` | Restore if permitted                       |
+| DELETE | `/weddings/{weddingId}`         | Start controlled deletion                  |
 
 ### 6.1 Create Wedding
 
@@ -365,13 +366,13 @@ The owner may retrieve and update only their own wedding. `GET` returns the wedd
 
 ### 6.4 Wedding Members and Invitations
 
-| Method | Endpoint | Authentication | Purpose |
-|---|---|---|---|
-| GET | `/weddings/{weddingId}/members` | Owner or member session | List active members and invitation history |
-| POST | `/weddings/{weddingId}/members` | Owner or Admin session | Create and email an invitation |
-| DELETE | `/weddings/{weddingId}/invitations/{invitationId}` | Owner or Admin session | Revoke a pending invitation |
-| POST | `/invitations/preview` | Public invitation token in JSON body | Show a safe invitation preview |
-| POST | `/invitations/accept` | Verified user session + invitation token | Join the wedding workspace |
+| Method | Endpoint                                           | Authentication                           | Purpose                                    |
+| ------ | -------------------------------------------------- | ---------------------------------------- | ------------------------------------------ |
+| GET    | `/weddings/{weddingId}/members`                    | Owner or member session                  | List active members and invitation history |
+| POST   | `/weddings/{weddingId}/members`                    | Owner or Admin session                   | Create and email an invitation             |
+| DELETE | `/weddings/{weddingId}/invitations/{invitationId}` | Owner or Admin session                   | Revoke a pending invitation                |
+| POST   | `/invitations/preview`                             | Public invitation token in JSON body     | Show a safe invitation preview             |
+| POST   | `/invitations/accept`                              | Verified user session + invitation token | Join the wedding workspace                 |
 
 Create request:
 
@@ -387,10 +388,10 @@ Acceptance requires an active, email-verified account whose normalized email mat
 
 ## 7. Wedding Settings APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/weddings/{weddingId}/settings` | Retrieve settings |
-| PATCH | `/weddings/{weddingId}/settings` | Update settings |
+| Method | Endpoint                         | Purpose           |
+| ------ | -------------------------------- | ----------------- |
+| GET    | `/weddings/{weddingId}/settings` | Retrieve settings |
+| PATCH  | `/weddings/{weddingId}/settings` | Update settings   |
 
 Supported settings include:
 
@@ -412,13 +413,42 @@ Allowed themes:
 
 ## 8. Event APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/weddings/{weddingId}/events` | Create event |
-| GET | `/weddings/{weddingId}/events` | List events |
-| GET | `/weddings/{weddingId}/events/{eventId}` | Retrieve event |
-| PATCH | `/weddings/{weddingId}/events/{eventId}` | Update event |
-| DELETE | `/weddings/{weddingId}/events/{eventId}` | Delete event |
+### Implemented contract - 2026-11-18
+
+This increment implements all five routes below for Owners, Admins, and Managers, with session authentication, Zod validation, wedding-scoped queries, and same-origin mutations. Archived weddings reject writes with 409. The broader example below describes future venue enrichment; the current strict request contract is:
+
+```json
+{
+  "name": "Engagement Ceremony",
+  "type": "CUSTOM",
+  "description": "An evening together",
+  "startDate": "2026-12-25T10:00:00+05:30",
+  "endDate": null,
+  "venue": { "name": "Grand Ballroom", "address": "Jaipur" },
+  "dressCode": "Traditional pastels",
+  "notes": "Private planning notes",
+  "rsvpDeadline": null,
+  "maxAttendees": null,
+  "status": "DRAFT"
+}
+```
+
+- Required: name (1–150 characters), type, startDate (ISO timestamp with offset), and venue object (empty name/address permitted). Optional strings default empty; endDate/deadline/capacity default null; status defaults DRAFT. Description/notes limit 2,000, venue name 150, address 500, dress code 200. Capacity, if supplied, is a positive integer up to 1,000,000.
+- Type: HALDI/MEHENDI/SANGEET/WEDDING/RECEPTION/CUSTOM. Status: DRAFT/PUBLISHED/CANCELLED. End must follow start if supplied; RSVP deadline cannot follow start. The server derives timezone from the wedding; clients cannot override it.
+- POST returns 201 `{ success: true, data: Event }`. Event includes normalized fields above plus `id`, `timezone`, and ISO `updatedAt`; no wedding ownership or session fields are returned.
+- GET list accepts `page` (1-based), returns `{ events, timezone, pagination: { page, total, hasMore } }` in the data envelope. Page size is 20; chronological order is stable by startDate then ID. Total includes cancelled events but excludes deleted events.
+- GET single returns Event. PATCH submits the complete editable fields plus `expectedUpdatedAt` from the last read. The server replaces editable fields, rejects missing version with 400 EVENT_VERSION_REQUIRED and stale version with 409 EVENT_CHANGED. Cancellation uses the same endpoint with status CANCELLED.
+- DELETE returns `{ eventId, removed: true }` and soft-deletes the event. It no longer appears in private reads/lists or dashboard counts; records/references remain for history.
+- Missing/inaccessible weddings and cross-wedding/missing events return 404. Invalid input returns the standard 400 VALIDATION_ERROR envelope. No live emails, guest assignments, RSVP collection, Places lookup, or public website publication occur through these endpoints.
+- Machine-readable contract: `openapi/events.yaml` (Events module).
+
+| Method | Endpoint                                 | Purpose        |
+| ------ | ---------------------------------------- | -------------- |
+| POST   | `/weddings/{weddingId}/events`           | Create event   |
+| GET    | `/weddings/{weddingId}/events`           | List events    |
+| GET    | `/weddings/{weddingId}/events/{eventId}` | Retrieve event |
+| PATCH  | `/weddings/{weddingId}/events/{eventId}` | Update event   |
+| DELETE | `/weddings/{weddingId}/events/{eventId}` | Delete event   |
 
 ### Create Event
 
@@ -460,16 +490,16 @@ Validation:
 
 ## 9. Guest APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/weddings/{weddingId}/guests` | Add guest |
-| GET | `/weddings/{weddingId}/guests` | List guests |
-| GET | `/weddings/{weddingId}/guests/{guestId}` | Retrieve guest |
-| PATCH | `/weddings/{weddingId}/guests/{guestId}` | Update guest |
-| DELETE | `/weddings/{weddingId}/guests/{guestId}` | Delete guest |
-| POST | `/weddings/{weddingId}/guests/{guestId}/invite` | Send invitation |
-| POST | `/weddings/{weddingId}/guests/{guestId}/revoke-invitation` | Revoke link |
-| POST | `/weddings/{weddingId}/guests/{guestId}/regenerate-invitation` | Regenerate link |
+| Method | Endpoint                                                       | Purpose         |
+| ------ | -------------------------------------------------------------- | --------------- |
+| POST   | `/weddings/{weddingId}/guests`                                 | Add guest       |
+| GET    | `/weddings/{weddingId}/guests`                                 | List guests     |
+| GET    | `/weddings/{weddingId}/guests/{guestId}`                       | Retrieve guest  |
+| PATCH  | `/weddings/{weddingId}/guests/{guestId}`                       | Update guest    |
+| DELETE | `/weddings/{weddingId}/guests/{guestId}`                       | Delete guest    |
+| POST   | `/weddings/{weddingId}/guests/{guestId}/invite`                | Send invitation |
+| POST   | `/weddings/{weddingId}/guests/{guestId}/revoke-invitation`     | Revoke link     |
+| POST   | `/weddings/{weddingId}/guests/{guestId}/regenerate-invitation` | Regenerate link |
 
 ### Add Guest
 
@@ -495,11 +525,11 @@ Email and phone are optional. Guest name is required.
 
 A guest can be assigned to multiple events. Each assignment carries its own maximum attendee count.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| PUT | `/weddings/{weddingId}/guests/{guestId}/events/{eventId}` | Create or update assignment |
-| GET | `/weddings/{weddingId}/guests/{guestId}/events` | List guest assignments |
-| DELETE | `/weddings/{weddingId}/guests/{guestId}/events/{eventId}` | Remove assignment |
+| Method | Endpoint                                                  | Purpose                     |
+| ------ | --------------------------------------------------------- | --------------------------- |
+| PUT    | `/weddings/{weddingId}/guests/{guestId}/events/{eventId}` | Create or update assignment |
+| GET    | `/weddings/{weddingId}/guests/{guestId}/events`           | List guest assignments      |
+| DELETE | `/weddings/{weddingId}/guests/{guestId}/events/{eventId}` | Remove assignment           |
 
 ### Assign Guest to Event
 
@@ -526,10 +556,10 @@ Rules:
 
 These endpoints use the guest's invitation token rather than an owner session.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/guest/invitations/{token}` | Get own invitation and assigned events |
-| PUT | `/guest/invitations/{token}/events/{eventId}/rsvp` | Create or update RSVP |
+| Method | Endpoint                                           | Purpose                                |
+| ------ | -------------------------------------------------- | -------------------------------------- |
+| GET    | `/guest/invitations/{token}`                       | Get own invitation and assigned events |
+| PUT    | `/guest/invitations/{token}/events/{eventId}/rsvp` | Create or update RSVP                  |
 
 ### 11.1 Retrieve Invitation
 
@@ -593,11 +623,11 @@ Pending is the initial state before the guest responds. It is not a guest-submit
 
 ### 11.3 RSVP Dashboard APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/weddings/{weddingId}/rsvps` | List owner-visible RSVPs |
-| GET | `/weddings/{weddingId}/rsvps/stats` | Get RSVP summary |
-| GET | `/weddings/{weddingId}/events/{eventId}/rsvps` | Event-specific RSVP list |
+| Method | Endpoint                                       | Purpose                  |
+| ------ | ---------------------------------------------- | ------------------------ |
+| GET    | `/weddings/{weddingId}/rsvps`                  | List owner-visible RSVPs |
+| GET    | `/weddings/{weddingId}/rsvps/stats`            | Get RSVP summary         |
+| GET    | `/weddings/{weddingId}/events/{eventId}/rsvps` | Event-specific RSVP list |
 
 Dashboard statistics should include:
 
@@ -611,10 +641,10 @@ Expected headcount sums attendee count for `YES` only.
 
 ## 12. Check-In APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/weddings/{weddingId}/events/{eventId}/check-ins` | List event check-in records |
-| PATCH | `/weddings/{weddingId}/guest-events/{assignmentId}/check-in` | Update check-in |
+| Method | Endpoint                                                     | Purpose                     |
+| ------ | ------------------------------------------------------------ | --------------------------- |
+| GET    | `/weddings/{weddingId}/events/{eventId}/check-ins`           | List event check-in records |
+| PATCH  | `/weddings/{weddingId}/guest-events/{assignmentId}/check-in` | Update check-in             |
 
 Request:
 
@@ -630,12 +660,20 @@ The server verifies the assignment belongs to the specified wedding and event. T
 
 ## 13. Task APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/weddings/{weddingId}/tasks` | Create task |
-| GET | `/weddings/{weddingId}/tasks` | List tasks |
-| GET | `/weddings/{weddingId}/tasks/{taskId}` | Get task |
-| PATCH | `/weddings/{weddingId}/tasks/{taskId}` | Update task |
+### Implemented contract - 2026-11-19
+
+All five routes below require a secure session and wedding Owner/Admin/Manager access. Mutations enforce same-origin requests; archived weddings reject writes. POST creates a task with title (1–160 chars), optional description, assignedUserId, eventId, dueDate (`YYYY-MM-DD`), priority, status, category and notes. Description/notes max 2,000; category max 100. Defaults are empty optional text, null optional IDs/date, MEDIUM priority and TODO status. Both relationship IDs must belong to the authorized wedding; assignment cannot target a guest, pending invitation, inactive user, or cancelled/deleted event.
+
+GET list accepts `tab=all|mine|completed`, optional status, priority, eventId (ObjectId or `general`), assignedUserId (ObjectId or `unassigned`), and page (default 1). Filters combine; `mine` always includes the acting-user constraint. It returns data `{ tasks, counts: { all, mine, completed }, pagination: { page, total, hasMore } }`; page size 25, ordered by dueDate then createdAt descending and ID. Counts are wedding-wide tab counts, independent of filters. Removed tasks are excluded. Empty query fields should be omitted.
+
+GET single and POST/PATCH return a Task view containing editable fields plus id, updatedAt, completedAt, derived overdue, memberName and eventName. POST returns 201. PATCH accepts one or more editable fields plus required `expectedUpdatedAt` from the last read, including a status-only update; stale changes return 409 TASK_CHANGED. Completed timestamps are server-managed. DELETE soft-deletes and returns `{ taskId, removed: true }`. Invalid assignee/event returns 400 INVALID_TASK_ASSIGNEE/INVALID_TASK_EVENT; malformed input returns 400 VALIDATION_ERROR; missing/inaccessible resources return 404. No email is sent. Machine-readable route contract: `openapi/tasks.yaml`.
+
+| Method | Endpoint                               | Purpose     |
+| ------ | -------------------------------------- | ----------- |
+| POST   | `/weddings/{weddingId}/tasks`          | Create task |
+| GET    | `/weddings/{weddingId}/tasks`          | List tasks  |
+| GET    | `/weddings/{weddingId}/tasks/{taskId}` | Get task    |
+| PATCH  | `/weddings/{weddingId}/tasks/{taskId}` | Update task |
 | DELETE | `/weddings/{weddingId}/tasks/{taskId}` | Delete task |
 
 Task statuses:
@@ -654,12 +692,12 @@ Priorities:
 
 ## 14. Expense APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/weddings/{weddingId}/expenses` | Create expense |
-| GET | `/weddings/{weddingId}/expenses` | List expenses |
-| GET | `/weddings/{weddingId}/expenses/{expenseId}` | Get expense |
-| PATCH | `/weddings/{weddingId}/expenses/{expenseId}` | Update expense |
+| Method | Endpoint                                     | Purpose        |
+| ------ | -------------------------------------------- | -------------- |
+| POST   | `/weddings/{weddingId}/expenses`             | Create expense |
+| GET    | `/weddings/{weddingId}/expenses`             | List expenses  |
+| GET    | `/weddings/{weddingId}/expenses/{expenseId}` | Get expense    |
+| PATCH  | `/weddings/{weddingId}/expenses/{expenseId}` | Update expense |
 | DELETE | `/weddings/{weddingId}/expenses/{expenseId}` | Delete expense |
 
 Create request:
@@ -683,24 +721,24 @@ The API records actual expenses only. It does not provide budget forecasting or 
 
 ## 15. Vendor APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/weddings/{weddingId}/vendors/search` | Search Google Places |
-| POST | `/weddings/{weddingId}/vendors` | Save selected vendor |
-| GET | `/weddings/{weddingId}/vendors` | List saved vendors |
-| GET | `/weddings/{weddingId}/vendors/{vendorId}` | Get vendor |
-| PATCH | `/weddings/{weddingId}/vendors/{vendorId}` | Update vendor |
-| DELETE | `/weddings/{weddingId}/vendors/{vendorId}` | Delete vendor |
+| Method | Endpoint                                   | Purpose              |
+| ------ | ------------------------------------------ | -------------------- |
+| GET    | `/weddings/{weddingId}/vendors/search`     | Search Google Places |
+| POST   | `/weddings/{weddingId}/vendors`            | Save selected vendor |
+| GET    | `/weddings/{weddingId}/vendors`            | List saved vendors   |
+| GET    | `/weddings/{weddingId}/vendors/{vendorId}` | Get vendor           |
+| PATCH  | `/weddings/{weddingId}/vendors/{vendorId}` | Update vendor        |
+| DELETE | `/weddings/{weddingId}/vendors/{vendorId}` | Delete vendor        |
 
 Vendor discovery is server-mediated. The application persists selected vendor records only. This is a directory feature, not a vendor marketplace.
 
 ## 16. Public Wedding Website APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/public/weddings/{slug}` | Get published wedding website |
-| GET | `/public/weddings/{slug}/events` | Get published events |
-| GET | `/public/weddings/{slug}/albums` | Get publicly authorized albums |
+| Method | Endpoint                         | Purpose                        |
+| ------ | -------------------------------- | ------------------------------ |
+| GET    | `/public/weddings/{slug}`        | Get published wedding website  |
+| GET    | `/public/weddings/{slug}/events` | Get published events           |
+| GET    | `/public/weddings/{slug}/albums` | Get publicly authorized albums |
 
 Public responses must exclude:
 
@@ -719,18 +757,18 @@ Only published wedding content is returned.
 
 ## 17. Album and Gallery APIs
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/weddings/{weddingId}/albums` | Create album |
-| GET | `/weddings/{weddingId}/albums` | List albums |
-| GET | `/weddings/{weddingId}/albums/{albumId}` | Get album |
-| PATCH | `/weddings/{weddingId}/albums/{albumId}` | Update album |
-| DELETE | `/weddings/{weddingId}/albums/{albumId}` | Delete album |
-| POST | `/weddings/{weddingId}/photos/upload-url` | Request upload authorization |
-| POST | `/weddings/{weddingId}/photos` | Confirm/save photo metadata |
-| GET | `/weddings/{weddingId}/photos` | List photos |
-| GET | `/weddings/{weddingId}/photos/{photoId}/download-url` | Get authorized download URL |
-| DELETE | `/weddings/{weddingId}/photos/{photoId}` | Delete photo |
+| Method | Endpoint                                              | Purpose                      |
+| ------ | ----------------------------------------------------- | ---------------------------- |
+| POST   | `/weddings/{weddingId}/albums`                        | Create album                 |
+| GET    | `/weddings/{weddingId}/albums`                        | List albums                  |
+| GET    | `/weddings/{weddingId}/albums/{albumId}`              | Get album                    |
+| PATCH  | `/weddings/{weddingId}/albums/{albumId}`              | Update album                 |
+| DELETE | `/weddings/{weddingId}/albums/{albumId}`              | Delete album                 |
+| POST   | `/weddings/{weddingId}/photos/upload-url`             | Request upload authorization |
+| POST   | `/weddings/{weddingId}/photos`                        | Confirm/save photo metadata  |
+| GET    | `/weddings/{weddingId}/photos`                        | List photos                  |
+| GET    | `/weddings/{weddingId}/photos/{photoId}/download-url` | Get authorized download URL  |
+| DELETE | `/weddings/{weddingId}/photos/{photoId}`              | Delete photo                 |
 
 ### Upload Flow
 
@@ -750,9 +788,9 @@ Only the owner can delete photos.
 
 ## 18. Dashboard API
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/weddings/{weddingId}/dashboard` | Get wedding dashboard summary |
+| Method | Endpoint                          | Purpose                       |
+| ------ | --------------------------------- | ----------------------------- |
+| GET    | `/weddings/{weddingId}/dashboard` | Get wedding dashboard summary |
 
 Suggested response:
 
@@ -824,35 +862,30 @@ The secure invitation URL must not be exposed in unrelated logs or analytics.
 ```typescript
 import { z } from "zod";
 
-export const createEventSchema = z.object({
-  name: z.string().trim().min(1).max(150),
+export const createEventSchema = z
+  .object({
+    name: z.string().trim().min(1).max(150),
 
-  type: z.enum([
-    "HALDI",
-    "MEHENDI",
-    "SANGEET",
-    "WEDDING",
-    "RECEPTION",
-    "CUSTOM"
-  ]),
+    type: z.enum([
+      "HALDI",
+      "MEHENDI",
+      "SANGEET",
+      "WEDDING",
+      "RECEPTION",
+      "CUSTOM",
+    ]),
 
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
 
-  timezone: z.string().min(1),
+    timezone: z.string().min(1),
 
-  maxAttendees: z
-    .number()
-    .int()
-    .positive()
-    .optional()
-}).refine(
-  data => new Date(data.startDate) < new Date(data.endDate),
-  {
+    maxAttendees: z.number().int().positive().optional(),
+  })
+  .refine((data) => new Date(data.startDate) < new Date(data.endDate), {
     message: "Event start must precede event end",
-    path: ["endDate"]
-  }
-);
+    path: ["endDate"],
+  });
 ```
 
 ### RSVP
@@ -862,14 +895,14 @@ export const rsvpSchema = z.discriminatedUnion("status", [
   z.object({
     status: z.literal("YES"),
     attendeeCount: z.number().int().min(1),
-    guestMessage: z.string().max(1000).optional()
+    guestMessage: z.string().max(1000).optional(),
   }),
 
   z.object({
     status: z.literal("NO"),
     attendeeCount: z.literal(0),
-    guestMessage: z.string().max(1000).optional()
-  })
+    guestMessage: z.string().max(1000).optional(),
+  }),
 ]);
 ```
 
@@ -997,3 +1030,44 @@ All private operations scope by weddingId; mutations check same-origin. Guest em
 ### 2026-11-17 ? Invitation permission and concurrency clarification
 
 Owners, Admins, and Managers can send and revoke member and guest invitations within their wedding. Admins and Managers may remove other Managers; only the owner may remove Admins. Self/owner removal remains forbidden. Concurrent invitation state changes can return `409 INVITATION_CHANGED`; refresh before retrying. Member acceptance requires SENT delivery status and commits membership and acceptance atomically.
+
+## Guest management increment ? 2026-11-19
+
+Implemented owner/Admin/Manager session endpoints under /api/v1:
+
+- GET /weddings/{weddingId}/guests: q (name, family, email, phone substring), eventId, rsvpStatus (PENDING/YES/NO/MIXED), page (25 groups/page). Returns data { guests, total, page, hasMore }.
+- POST /weddings/{weddingId}/guests: fullName (required, 1?120), email (optional, valid email or empty), phone (optional, max 30), groupName (optional, max 120), notes (optional, max 2000), maxPartySize (required integer 1?1000), eventIds (optional unique array, up to 100). Returns the saved guest with 201.
+- GET /weddings/{weddingId}/guests/{guestId}: guest details and assigned-event RSVP summaries.
+- PATCH /weddings/{weddingId}/guests/{guestId}: submits the same complete editable form plus expectedUpdatedAt (ISO timestamp); replaces its selected events atomically. Stale edits return 409 GUEST_CHANGED.
+- DELETE /weddings/{weddingId}/guests/{guestId}: soft-removes the guest, revokes their link, and returns {guestId, removed:true}. RSVP/assignment history is retained.
+
+Guest views contain id, fullName, email, phone, groupName, notes, maxPartySize, updatedAt, eventIds, events [{id,name,status,attendeeCount}], and aggregate rsvpStatus. No invitation token is returned. Missing optional text is returned as empty text. An existing email is unique within a wedding (409 GUEST_EMAIL_EXISTS). All private operations enforce wedding isolation; archived weddings are read-only.
+
+Each selected event receives maxAttendees=maxPartySize in guest_events. New assignments must refer to active events in the same wedding; existing unavailable assignments can be retained. A responded assignment cannot be removed (409 GUEST_HAS_RSVP); party size cannot be below a confirmed attendee count (409 PARTY_SIZE_TOO_SMALL). The individual per-event assignment APIs described above remain future work; the current form applies one group limit to all selected events.
+
+RSVP summaries use only responses for assigned events: all YES => YES, all NO => NO, no responses/all pending => PENDING, otherwise MIXED. Attendance is shown per event to avoid counting the same person multiple times. Event filtering selects guest groups assigned to that event; RSVP filtering applies to the group's overall response status. Invitation acceptance is not an RSVP. Public event RSVP submission remains a later increment.
+
+Adding/editing a guest never sends email. Existing Members-page guest-invitations endpoints can invite a saved guest by matching their email. An email change invalidates old invitation tokens and clears delivery/acceptance state. Unsent records are excluded from the invitation roster.
+
+## Personal invitations and live RSVP increment - 2026-11-21
+
+This implements the guest-token RSVP APIs described in section 11. Guest links do not require a user account, cookie, or login. Owners/Admins/Managers manage links through session-authenticated, same-origin routes:
+
+- GET /weddings/{weddingId}/guests/{guestId}/rsvp-link returns {active, expiresAt}; it never returns an existing raw token.
+- POST at that route creates/replaces the RSVP link and returns 201 {url, active:true, expiresAt}. Links created here expire after 30 days. Replacing invalidates the previous link without deleting responses.
+- DELETE at that route revokes RSVP access and retains responses.
+- GET /guest/invitations/{token} returns the guest's personal invitation: guestName, weddingName, partner names, weddingDate, city, timezone, description, expiresAt, and only their active assigned events. Event views contain id, name, description, UTC start/end, venueName/address, dressCode, maxAttendees, deadline, closed, own status/count/message. No guest contact details, private notes, other guests, internal owner data, or dashboard permission is exposed.
+- PUT /guest/invitations/{token} accepts {responses:[{eventId,response:{status,attendeeCount,guestMessage?}}]}. 1-100 unique events; all submitted responses commit atomically.
+- PUT /guest/invitations/{token}/events/{eventId}/rsvp accepts a single {status,attendeeCount,guestMessage?}. YES requires an integer 1-1000; NO requires zero; message max 1000 characters.
+
+Public response writes validate token expiry/revocation, wedding availability, current guest-event assignment, active event, deadline, guest party/assignment limits, and total event capacity. Errors include 410 INVITATION_UNAVAILABLE, 403 EVENT_NOT_ASSIGNED, 409 RSVP_CLOSED, 400 RSVP_PARTY_LIMIT, and 409 EVENT_CAPACITY_REACHED. Saves return the updated personal invitation in the standard success envelope. Request validation remains Zod; tokens have 256 bits of randomness and only HMAC hashes are stored. Public writes check Origin when supplied, and requests are rate limited with fixed 15-minute key windows (30 writes, 300 API reads, 120 page loads per token/window).
+
+The guest page lives at /invite/{token}, with noindex/no-referrer/no-store handling. The personal token explicitly authorizes its assigned non-cancelled events (including planning drafts); it does not publish the wedding website. Archived/deleted weddings and removed guests are unavailable. Public invitation and API request paths are excluded from development request logging.
+
+New Members-page email invitations include the personal RSVP URL with the existing seven-day expiry and a separate receipt acknowledgement link. Receipt acceptance remains distinct from event attendance. Email failure revokes the newly generated RSVP token; guest email changes clear it; guest deletion revokes it. Existing receipt-only links remain supported. Creating/copying an RSVP link does not send email.
+
+Guest confirmations update immediately from the save response. Dashboard/Guests/Invitations & RSVP screens refresh server data every five seconds while visible and on focus; refresh pauses for active forms or open dialogs. A same-browser BroadcastChannel also requests a refresh after a save. Other open personal invitation pages poll every 15 seconds while not editing. RSVP totals count responses and YES headcounts per active guest-event assignment, not distinct people across the wedding. Guest details show the guest's response messages. Machine-readable contract: openapi/rsvp.json.
+
+Shared invitations (2026-11-21): POST /api/v1/weddings/{weddingId}/shared-invitation with eventIds and maxPartySize issues or replaces a 30-day link. DELETE revokes registration. Public POST /api/v1/guest/invitations/open/{token} accepts name, optional phone, visitorKey, status (YES/NO), and attendeeCount (1–1000 for YES, 0 for NO). It returns 201 `{ path: "/invite/households/{privateToken}" }`.
+
+The shared link remains a reusable starting form for every household. After a successful response the browser clears its temporary visitor key and redirects to the returned private household link. Public GET and PUT `/guest/invitations/households/{privateToken}` read or update only that household's name, optional phone, attendance status, and attendee count. The raw private token is delivered only once in the redirect path; only its hash is stored, it shares the common link expiry, and link revocation invalidates it. Opening the common link later starts a fresh response rather than editing a prior household.

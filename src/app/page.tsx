@@ -22,10 +22,14 @@ import SiteLogo from "./site-logo";
 import styles from "./home.module.css";
 
 const photos = {
-  couple: "https://lh3.googleusercontent.com/aida/ALJJyrCdpLL7nT4h9tT5i6XBYT2g-B5Hka4qwG_GkFLbGMBaX_o-vrrVlZ9MqIdR_M5-5hfT9T9YeYIKt5FID5bK2hiE-dlOqRCzHVIsw-UvzD2RVWHvSznXgooo3ZgqHN-Ykh9KO-OdL8kkV8b6CoQ6RGNSwUR8RW1HAwBCqT9JX2aovqrr-AjgZcO8BX5_YVCaR951UijreYn2wQPwLAstOJodUO-GJZ_cB0L2v7an9oUW_w",
-  mandap: "https://lh3.googleusercontent.com/aida/ALJJyrBAoimJEJ3i88HTl-JgqA3IxtIqD8xfsyaoUIFsZ7FWVD-Kq4meifMuzcZ1jRhulY2TUqMuywXKDEOW56e04LbKKHlMWVklvQeWDkeiUWY7r1YI-nTkZx3tqhKW9HQLLqTHg9SDsIvi8GZExWB92sxTayzS2G0t7JlLbKEBOaOiA2-WkMbjOS5SAWtorWabz6ZL1BnXs9fiuHmbL2oyKwT-mlFhpQWrIWZszSrIkHKl",
-  banquet: "https://lh3.googleusercontent.com/aida/ALJJyrCFckPBArDtPn4gU9tF3kL3qZw3mL5XCL8tmN9uYAF5tY7Q-oPyftXVrSrI42brQpPydPSXFm-Se0JDji1kT6SVTOEc374ucuPjZrQa1eyAcUs4KUOxaKKPm-JBuDoa1zO3bm9j6z9HRRu_ie5CiuE6Qi3MHJtll7whAo1CyHBoHEUOKS81SLgMq1WdvLxe2ORCF2w7DRjybFHh4bnp47At2__glNpNF07QzwFjwVyDhg",
-  stationery: "https://lh3.googleusercontent.com/aida/ALJJyrCntZNFgsVjoAASpQ_eQi24bxsBimtrqV9mcwR0RjiKY0uCMjA4Widl4AMg6DIgfWW9QB6KBi7tlJd3Hd4NmN6tT3HZSqmkpW27nNBg2lNmD63anqxS8zRQXMsVCXXGaCpBDbJIZrW8nDh1oIG8Zi4CAdVDb04E_15skIi3p2BvDdj1TbcFtkM8MyxPjZcsf-_rITtw7zXuYBO9nWzAkum4g0tLiFrTajwF33uXWofQ3Q",
+  couple:
+    "https://lh3.googleusercontent.com/aida/ALJJyrCdpLL7nT4h9tT5i6XBYT2g-B5Hka4qwG_GkFLbGMBaX_o-vrrVlZ9MqIdR_M5-5hfT9T9YeYIKt5FID5bK2hiE-dlOqRCzHVIsw-UvzD2RVWHvSznXgooo3ZgqHN-Ykh9KO-OdL8kkV8b6CoQ6RGNSwUR8RW1HAwBCqT9JX2aovqrr-AjgZcO8BX5_YVCaR951UijreYn2wQPwLAstOJodUO-GJZ_cB0L2v7an9oUW_w",
+  mandap:
+    "https://lh3.googleusercontent.com/aida/ALJJyrBAoimJEJ3i88HTl-JgqA3IxtIqD8xfsyaoUIFsZ7FWVD-Kq4meifMuzcZ1jRhulY2TUqMuywXKDEOW56e04LbKKHlMWVklvQeWDkeiUWY7r1YI-nTkZx3tqhKW9HQLLqTHg9SDsIvi8GZExWB92sxTayzS2G0t7JlLbKEBOaOiA2-WkMbjOS5SAWtorWabz6ZL1BnXs9fiuHmbL2oyKwT-mlFhpQWrIWZszSrIkHKl",
+  banquet:
+    "https://lh3.googleusercontent.com/aida/ALJJyrCFckPBArDtPn4gU9tF3kL3qZw3mL5XCL8tmN9uYAF5tY7Q-oPyftXVrSrI42brQpPydPSXFm-Se0JDji1kT6SVTOEc374ucuPjZrQa1eyAcUs4KUOxaKKPm-JBuDoa1zO3bm9j6z9HRRu_ie5CiuE6Qi3MHJtll7whAo1CyHBoHEUOKS81SLgMq1WdvLxe2ORCF2w7DRjybFHh4bnp47At2__glNpNF07QzwFjwVyDhg",
+  stationery:
+    "https://lh3.googleusercontent.com/aida/ALJJyrCntZNFgsVjoAASpQ_eQi24bxsBimtrqV9mcwR0RjiKY0uCMjA4Widl4AMg6DIgfWW9QB6KBi7tlJd3Hd4NmN6tT3HZSqmkpW27nNBg2lNmD63anqxS8zRQXMsVCXXGaCpBDbJIZrW8nDh1oIG8Zi4CAdVDb04E_15skIi3p2BvDdj1TbcFtkM8MyxPjZcsf-_rITtw7zXuYBO9nWzAkum4g0tLiFrTajwF33uXWofQ3Q",
   qr: "/images/qr-preview.svg",
 };
 
@@ -206,7 +210,13 @@ function Stars({ label = "5 out of 5 stars" }: { label?: string }) {
   return (
     <span className={styles.stars} role="img" aria-label={label}>
       {Array.from({ length: 5 }, (_, index) => (
-        <Star key={index} aria-hidden="true" size={13} fill="currentColor" strokeWidth={1.3} />
+        <Star
+          key={index}
+          aria-hidden="true"
+          size={13}
+          fill="currentColor"
+          strokeWidth={1.3}
+        />
       ))}
     </span>
   );
@@ -241,7 +251,9 @@ function splitDescription(description: string, wordLimit = 10) {
 
 export default async function HomePage() {
   const cookieStore = await cookies();
-  const user = await getSessionUser(cookieStore.get(SESSION_COOKIE_NAME)?.value);
+  const user = await getSessionUser(
+    cookieStore.get(SESSION_COOKIE_NAME)?.value,
+  );
 
   return (
     <div className={styles.page} id="top">
@@ -261,15 +273,22 @@ export default async function HomePage() {
                 Sign in
               </Link>
             )}
-            <Link className={styles.headerButton} href={user ? "/dashboard" : "/sign-up"}>
-              {user ? "Go to your dashboard" : "Start Planning"} <ArrowRight aria-hidden="true" size={14} />
+            <Link
+              className={styles.headerButton}
+              href={user ? "/dashboard" : "/sign-up"}
+            >
+              {user ? "Go to your dashboard" : "Start Planning"}{" "}
+              <ArrowRight aria-hidden="true" size={14} />
             </Link>
             <details className={styles.mobileMenu}>
               <summary aria-label="Open navigation menu">
                 <Menu aria-hidden="true" size={18} />
                 <span>Menu</span>
               </summary>
-              <nav className={styles.mobileMenuPanel} aria-label="Mobile navigation">
+              <nav
+                className={styles.mobileMenuPanel}
+                aria-label="Mobile navigation"
+              >
                 <a href="#ceremonies">Ceremonies</a>
                 <a href="#moments">Moments</a>
                 <a href="#blessings">Blessings</a>
@@ -285,14 +304,17 @@ export default async function HomePage() {
         <section className={styles.hero} aria-labelledby="hero-title">
           <div className={styles.heroInner}>
             <div className={styles.heroCopy}>
-              <p className={styles.heroEyebrow}>An intimate royal celebration in Udaipur</p>
+              <p className={styles.heroEyebrow}>
+                An intimate royal celebration in Udaipur
+              </p>
               <h1 id="hero-title">
                 The Union of <em>Aanya & Kabir</em>
               </h1>
               <p className={styles.heroDescription}>
-                With the cherished blessings of our parents, ancestors, and beloved families,
-                we invite you to immerse in four days of timeless heritage rituals, sacred Vedic
-                vows, and joyful camaraderie along the tranquil waters of Lake Pichola.
+                With the cherished blessings of our parents, ancestors, and
+                beloved families, we invite you to immerse in four days of
+                timeless heritage rituals, sacred Vedic vows, and joyful
+                camaraderie along the tranquil waters of Lake Pichola.
               </p>
               <div className={styles.eventFacts}>
                 <div>
@@ -310,7 +332,8 @@ export default async function HomePage() {
               </div>
               <div className={styles.heroActions}>
                 <a className={styles.primaryButton} href="#ceremonies">
-                  Explore Ceremonial Itinerary <ArrowRight aria-hidden="true" size={16} />
+                  Explore Ceremonial Itinerary{" "}
+                  <ArrowRight aria-hidden="true" size={16} />
                 </a>
                 <a className={styles.secondaryButton} href="#moments">
                   View Celebration Moments
@@ -335,7 +358,9 @@ export default async function HomePage() {
                   <span>November 2025</span>
                 </div>
               </div>
-              <span className={styles.heroImageOrnament} aria-hidden="true">❋</span>
+              <span className={styles.heroImageOrnament} aria-hidden="true">
+                ❋
+              </span>
             </div>
           </div>
         </section>
@@ -343,19 +368,28 @@ export default async function HomePage() {
         <section className={styles.overview} aria-labelledby="overview-title">
           <div className={styles.overviewContainer}>
             <div className={styles.overviewHeading}>
-              <p className={styles.overviewEyebrow}>Your celebration at a glance</p>
+              <p className={styles.overviewEyebrow}>
+                Your celebration at a glance
+              </p>
               <h2 id="overview-title">The countdown is on.</h2>
               <p>Every thoughtful detail brings the big day a little closer.</p>
               <span className={styles.demoNote}>Sample planning figures</span>
             </div>
             <div className={styles.overviewContent}>
-              <article className={styles.countdownCard} aria-label="12 days until the wedding">
+              <article
+                className={styles.countdownCard}
+                aria-label="12 days until the wedding"
+              >
                 <span className={styles.countdownIcon} aria-hidden="true">
                   <Heart size={17} strokeWidth={1.5} />
                 </span>
                 <p>Counting down</p>
-                <div className={styles.countdownValue}>12 <span>days</span></div>
-                <span className={styles.countdownCaption}>until Aanya &amp; Kabir’s celebration</span>
+                <div className={styles.countdownValue}>
+                  12 <span>days</span>
+                </div>
+                <span className={styles.countdownCaption}>
+                  until Aanya &amp; Kabir’s celebration
+                </span>
               </article>
               <div className={styles.overviewStats}>
                 {planningStats.map((stat) => {
@@ -378,15 +412,24 @@ export default async function HomePage() {
         </section>
 
         <section className={styles.verse} aria-label="A wedding blessing">
-          <Heart aria-hidden="true" size={18} fill="currentColor" strokeWidth={1.2} />
+          <Heart
+            aria-hidden="true"
+            size={18}
+            fill="currentColor"
+            strokeWidth={1.2}
+          />
           <blockquote>
-            “May the bond forged under sacred Agni bring warmth to two ancestral hearths, and may
-            seven steps together bloom into a lifetime of grace and harmony.”
+            “May the bond forged under sacred Agni bring warmth to two ancestral
+            hearths, and may seven steps together bloom into a lifetime of grace
+            and harmony.”
           </blockquote>
           <p>From the Rigvedic Vivaha Sukta · Sharma & Singhania Families</p>
         </section>
 
-        <section className={`${styles.section} ${styles.ceremonySection}`} id="ceremonies">
+        <section
+          className={`${styles.section} ${styles.ceremonySection}`}
+          id="ceremonies"
+        >
           <div className={styles.sectionContainer}>
             <SectionHeading
               eyebrow="The ceremonial journey"
@@ -402,12 +445,16 @@ export default async function HomePage() {
                     <span>{ceremony.time}</span>
                   </div>
                   <div className={styles.ceremonyDetails}>
-                    <span className={styles.ritualNumber}>0{index + 1} / 05</span>
+                    <span className={styles.ritualNumber}>
+                      0{index + 1} / 05
+                    </span>
                     <h3>{ceremony.name}</h3>
                     <p>{ceremony.description}</p>
                   </div>
                   <div className={styles.ceremonyMeta}>
-                    <span><MapPin aria-hidden="true" size={13} /> {ceremony.venue}</span>
+                    <span>
+                      <MapPin aria-hidden="true" size={13} /> {ceremony.venue}
+                    </span>
                     <span>{ceremony.attire}</span>
                   </div>
                 </article>
@@ -416,7 +463,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.momentsSection}`} id="moments">
+        <section
+          className={`${styles.section} ${styles.momentsSection}`}
+          id="moments"
+        >
           <div className={styles.sectionContainer}>
             <SectionHeading
               eyebrow="Moments of the marriage"
@@ -442,11 +492,16 @@ export default async function HomePage() {
                       />
                     </div>
                     <div className={styles.momentCopy}>
-                      <span className={styles.momentEyebrow}>{moment.eyebrow}</span>
+                      <span className={styles.momentEyebrow}>
+                        {moment.eyebrow}
+                      </span>
                       <h3>{moment.title}</h3>
                       <details className={styles.momentReadMore}>
                         <summary>
-                          <span>{description.preview}{description.remainder ? "…" : ""}</span>
+                          <span>
+                            {description.preview}
+                            {description.remainder ? "…" : ""}
+                          </span>
                           {description.remainder && (
                             <span className={styles.readMoreLabel}>
                               <span className={styles.seeMore}>See more</span>
@@ -454,7 +509,9 @@ export default async function HomePage() {
                             </span>
                           )}
                         </summary>
-                        {description.remainder && <p>{description.remainder}</p>}
+                        {description.remainder && (
+                          <p>{description.remainder}</p>
+                        )}
                       </details>
                     </div>
                   </article>
@@ -464,7 +521,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.feastSection}`} id="feasts">
+        <section
+          className={`${styles.section} ${styles.feastSection}`}
+          id="feasts"
+        >
           <div className={styles.sectionContainer}>
             <SectionHeading
               eyebrow="A sensory celebration"
@@ -485,7 +545,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.blessingsSection}`} id="blessings">
+        <section
+          className={`${styles.section} ${styles.blessingsSection}`}
+          id="blessings"
+        >
           <div className={styles.sectionContainer}>
             <SectionHeading
               eyebrow="Affection & blessings"
@@ -495,7 +558,9 @@ export default async function HomePage() {
             <div className={styles.blessingsGrid}>
               {blessings.map((blessing) => (
                 <figure className={styles.blessingCard} key={blessing.names}>
-                  <span className={styles.quoteMark} aria-hidden="true">“</span>
+                  <span className={styles.quoteMark} aria-hidden="true">
+                    “
+                  </span>
                   <blockquote>{blessing.quote}</blockquote>
                   <figcaption>
                     <strong>{blessing.names}</strong>
@@ -507,7 +572,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.photoSection}`} id="photo-share">
+        <section
+          className={`${styles.section} ${styles.photoSection}`}
+          id="photo-share"
+        >
           <div className={styles.sectionContainer}>
             <SectionHeading
               eyebrow="Guest memories & live vault"
@@ -528,32 +596,60 @@ export default async function HomePage() {
                     className={styles.qrImage}
                   />
                 </div>
-                <p><Camera aria-hidden="true" size={14} /> Scan with any phone</p>
+                <p>
+                  <Camera aria-hidden="true" size={14} /> Scan with any phone
+                </p>
                 <span>Instant guest access · High-resolution preservation</span>
               </div>
               <div className={styles.photoSteps}>
                 <article>
                   <span>1</span>
-                  <div><h3>Open Camera</h3><p>Simply scan the QR code using any smartphone camera or QR reader.</p></div>
+                  <div>
+                    <h3>Open Camera</h3>
+                    <p>
+                      Simply scan the QR code using any smartphone camera or QR
+                      reader.
+                    </p>
+                  </div>
                 </article>
                 <article>
                   <span>2</span>
-                  <div><h3>Instant Upload</h3><p>Drop high-resolution photos and candid videos from any of the four ceremonial days.</p></div>
+                  <div>
+                    <h3>Instant Upload</h3>
+                    <p>
+                      Drop high-resolution photos and candid videos from any of
+                      the four ceremonial days.
+                    </p>
+                  </div>
                 </article>
                 <article>
                   <span>3</span>
-                  <div><h3>Relive the Collective Album</h3><p>Explore guest captures together and download full-resolution memories.</p></div>
+                  <div>
+                    <h3>Relive the Collective Album</h3>
+                    <p>
+                      Explore guest captures together and download
+                      full-resolution memories.
+                    </p>
+                  </div>
                 </article>
                 <div className={styles.photoActions}>
-                  <a className={styles.primaryButton} href="#photo-share"><Upload aria-hidden="true" size={15} /> Upload Photos Directly</a>
-                  <a className={styles.secondaryButton} href="#moments">View Guest Gallery</a>
+                  <a className={styles.primaryButton} href="#photo-share">
+                    <Upload aria-hidden="true" size={15} /> Upload Photos
+                    Directly
+                  </a>
+                  <a className={styles.secondaryButton} href="#moments">
+                    View Guest Gallery
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.reviewsSection}`} id="reviews">
+        <section
+          className={`${styles.section} ${styles.reviewsSection}`}
+          id="reviews"
+        >
           <div className={styles.sectionContainer}>
             <SectionHeading
               eyebrow="Guest impressions & heritage memories"
@@ -561,9 +657,13 @@ export default async function HomePage() {
               description="Revered memories shared by royal attendees, elders, and cherished guests honoring four unforgettable days of union."
             />
             <div className={styles.reviewsLayout}>
-              <aside className={styles.ratingSummary} aria-label="Guest ratings summary">
+              <aside
+                className={styles.ratingSummary}
+                aria-label="Guest ratings summary"
+              >
                 <div className={styles.ratingScore}>
-                  <strong>4.9</strong><span>/ 5.0</span>
+                  <strong>4.9</strong>
+                  <span>/ 5.0</span>
                 </div>
                 <Stars />
                 <p className={styles.ratingCount}>120+ cherished impressions</p>
@@ -575,30 +675,52 @@ export default async function HomePage() {
                     ["Hospitality & Care", "4.8", "92%"],
                   ].map(([label, score, width]) => (
                     <div className={styles.ratingBarRow} key={label}>
-                      <span>{label}</span><span className={styles.ratingTrack}><span style={{ width }} /></span><strong>{score}</strong>
+                      <span>{label}</span>
+                      <span className={styles.ratingTrack}>
+                        <span style={{ width }} />
+                      </span>
+                      <strong>{score}</strong>
                     </div>
                   ))}
                 </div>
-                <p className={styles.verifiedNote}><ShieldCheck aria-hidden="true" size={13} /> Verified wedding guest impressions</p>
+                <p className={styles.verifiedNote}>
+                  <ShieldCheck aria-hidden="true" size={13} /> Verified wedding
+                  guest impressions
+                </p>
               </aside>
               <div className={styles.reviewColumn}>
                 {reviews.map((review) => (
                   <article className={styles.reviewCard} key={review.names}>
                     <div className={styles.reviewHeader}>
-                      <div><h3>{review.names}</h3><span>{review.relation}</span></div>
+                      <div>
+                        <h3>{review.names}</h3>
+                        <span>{review.relation}</span>
+                      </div>
                       <Stars />
                     </div>
                     <blockquote>“{review.quote}”</blockquote>
                     <p>{review.attended}</p>
-                    <span className={styles.reviewVerified}><CheckCircle2 aria-hidden="true" size={12} /> Verified guest</span>
+                    <span className={styles.reviewVerified}>
+                      <CheckCircle2 aria-hidden="true" size={12} /> Verified
+                      guest
+                    </span>
                   </article>
                 ))}
                 <form className={styles.blessingForm}>
                   <label htmlFor="blessing">Share your blessing & rating</label>
-                  <div className={styles.formStars}><Stars label="Selected rating: 5 out of 5 stars" /></div>
+                  <div className={styles.formStars}>
+                    <Stars label="Selected rating: 5 out of 5 stars" />
+                  </div>
                   <div className={styles.formRow}>
-                    <input id="blessing" type="text" placeholder="Write a blessing or memory…" />
-                    <button type="button">Submit Blessing <ArrowRight aria-hidden="true" size={14} /></button>
+                    <input
+                      id="blessing"
+                      type="text"
+                      placeholder="Write a blessing or memory…"
+                    />
+                    <button type="button">
+                      Submit Blessing{" "}
+                      <ArrowRight aria-hidden="true" size={14} />
+                    </button>
                   </div>
                 </form>
               </div>
@@ -609,16 +731,31 @@ export default async function HomePage() {
 
       <footer className={styles.footer}>
         <SiteLogo />
-        <p>An intimate wedding heirloom chronicle commemorating the union of Aanya Sharma and Kabir Singhania at Zenana Mahal, Lake Pichola, Udaipur.</p>
+        <p>
+          An intimate wedding heirloom chronicle commemorating the union of
+          Aanya Sharma and Kabir Singhania at Zenana Mahal, Lake Pichola,
+          Udaipur.
+        </p>
         <nav aria-label="Footer navigation">
-          <a href="#top">The Union</a><a href="#ceremonies">Ceremonies</a><a href="#moments">Moments</a><a href="#feasts">The Feasts</a><a href="#blessings">Family Blessings</a><a href="#reviews">Reviews & Ratings</a><a href="#photo-share">Photo Vault / QR</a>
+          <a href="#top">The Union</a>
+          <a href="#ceremonies">Ceremonies</a>
+          <a href="#moments">Moments</a>
+          <a href="#feasts">The Feasts</a>
+          <a href="#blessings">Family Blessings</a>
+          <a href="#reviews">Reviews & Ratings</a>
+          <a href="#photo-share">Photo Vault / QR</a>
         </nav>
         <div className={styles.footerBottom}>
-          <span>© 2025 Sharma & Singhania Families · With heartfelt gratitude to our loved ones.</span>
+          <span>
+            © 2025 Sharma & Singhania Families · With heartfelt gratitude to our
+            loved ones.
+          </span>
           <span>Udaipur · Rajasthan, India</span>
         </div>
       </footer>
-      <a className={styles.backToTop} href="#top" aria-label="Back to top"><ArrowDown aria-hidden="true" size={15} /></a>
+      <a className={styles.backToTop} href="#top" aria-label="Back to top">
+        <ArrowDown aria-hidden="true" size={15} />
+      </a>
     </div>
   );
 }

@@ -26,9 +26,12 @@ describe("withErrorHandling", () => {
       return NextResponse.json({ success: true });
     });
 
-    const response = await route(new NextRequest("http://localhost/api/v1/test"), {
-      params: Promise.resolve({}),
-    });
+    const response = await route(
+      new NextRequest("http://localhost/api/v1/test"),
+      {
+        params: Promise.resolve({}),
+      },
+    );
 
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({

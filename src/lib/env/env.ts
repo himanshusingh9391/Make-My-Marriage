@@ -35,10 +35,18 @@ export const environment = baseEnvironmentSchema.parse(process.env);
 export function requireMongoUri(): string {
   const uri = environment.MONGODB_URI?.trim();
   if (!uri) {
-    throw new AppError("MONGODB_URI is required to connect to MongoDB.", "SERVER_CONFIGURATION_ERROR", 503);
+    throw new AppError(
+      "MONGODB_URI is required to connect to MongoDB.",
+      "SERVER_CONFIGURATION_ERROR",
+      503,
+    );
   }
   if (!uri.startsWith("mongodb://") && !uri.startsWith("mongodb+srv://")) {
-    throw new AppError("MONGODB_URI must use mongodb:// or mongodb+srv://.", "SERVER_CONFIGURATION_ERROR", 503);
+    throw new AppError(
+      "MONGODB_URI must use mongodb:// or mongodb+srv://.",
+      "SERVER_CONFIGURATION_ERROR",
+      503,
+    );
   }
 
   return uri;
@@ -46,9 +54,9 @@ export function requireMongoUri(): string {
 
 export function requireResendConfig() {
   const result = resendConfigSchema.safeParse({
-      apiKey: environment.RESEND_API_KEY,
-      fromEmail: environment.RESEND_FROM_EMAIL,
-    });
+    apiKey: environment.RESEND_API_KEY,
+    fromEmail: environment.RESEND_FROM_EMAIL,
+  });
   if (!result.success) {
     throw new AppError(
       "Email sending is not configured correctly. Set RESEND_API_KEY and RESEND_FROM_EMAIL (for testing: onboarding@resend.dev).",

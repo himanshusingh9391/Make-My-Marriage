@@ -6,9 +6,17 @@ import { AppError } from "@/lib/http/app-error";
 export const SESSION_COOKIE_NAME = "mmm_session";
 export const REMEMBERED_SESSION_DAYS = 30;
 
-function hmac(value: string, secret: string | undefined, purpose: string): string {
+function hmac(
+  value: string,
+  secret: string | undefined,
+  purpose: string,
+): string {
   if (!secret) {
-    throw new AppError(`${purpose} is not configured.`, "SERVER_CONFIGURATION_ERROR", 503);
+    throw new AppError(
+      `${purpose} is not configured.`,
+      "SERVER_CONFIGURATION_ERROR",
+      503,
+    );
   }
 
   return createHmac("sha256", secret).update(value).digest("hex");
@@ -31,13 +39,14 @@ export function hashVerificationToken(token: string): string {
 }
 
 export function createWeddingSlug(label: string): string {
-  const base = label
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 48) || "wedding";
+  const base =
+    label
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 48) || "wedding";
 
   return `${base}-${randomBytes(4).toString("hex")}`;
 }
