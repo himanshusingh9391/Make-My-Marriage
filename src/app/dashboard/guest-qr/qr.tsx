@@ -23,13 +23,7 @@ export default function GuestQR({ id }: { id: string }) {
         setMessage("Guest access revoked for this wedding.");
         return;
       }
-      const origin = process.env.NEXT_PUBLIC_APP_URL;
-      const url = new URL(
-        result.data.path,
-        origin && !/localhost|127\.0\.0\.1/.test(origin)
-          ? origin
-          : window.location.origin,
-      ).href;
+      const url = new URL(result.data.path, window.location.origin).href;
       setLink(url);
       setQr(await QRCode.toDataURL(url, { width: 384, margin: 4 }));
     } catch (e) {

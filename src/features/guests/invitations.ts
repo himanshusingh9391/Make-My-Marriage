@@ -139,10 +139,10 @@ export async function sendGuestInvitation(
       throw error;
     }
   }
-  const url = new URL(`/invite/${token}`, environment.NEXT_PUBLIC_APP_URL);
+  const url = new URL(`/invite/${token}`, environment.APP_URL);
   const receiptUrl = new URL(
     "/guest-invitation",
-    environment.NEXT_PUBLIC_APP_URL,
+    environment.APP_URL,
   );
   receiptUrl.searchParams.set("token", token);
   try {

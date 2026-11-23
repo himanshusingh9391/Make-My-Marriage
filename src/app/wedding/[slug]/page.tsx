@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import QRCode from "qrcode";
+import { environment } from "@/lib/env/env";
 import SiteLogo from "@/app/site-logo";
 import { getPublicWeddingWebsite } from "@/features/weddings/website-service";
 import { AppError } from "@/lib/http/app-error";
@@ -100,7 +101,7 @@ function eventSummary(type: string, name: string) {
 }
 
 function getPublicOrigin(requestHeaders: Headers) {
-  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const configured = environment.APP_URL.trim();
   if (configured && !/localhost|127\.0\.0\.1/i.test(configured)) {
     try {
       const url = new URL(configured);

@@ -41,7 +41,7 @@ function view(link: SharedLink | null) {
   return {
     url: new URL(
       "/invite/open/" + tokenFor(link.nonce),
-      environment.NEXT_PUBLIC_APP_URL,
+      environment.APP_URL,
     ).href,
     expiresAt: link.expiresAt.toISOString(),
   };

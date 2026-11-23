@@ -102,7 +102,7 @@ async function sendVerificationEmail(
   const client = resendClient();
   const verificationUrl = new URL(
     "/verify-email",
-    environment.NEXT_PUBLIC_APP_URL,
+    environment.APP_URL,
   );
   verificationUrl.searchParams.set("token", token);
   if (nextTo) verificationUrl.searchParams.set("nextTo", nextTo);
@@ -143,7 +143,7 @@ export async function registerAccount(input: RegisterInput) {
   if (parsed.nextTo) {
     const token = new URL(
       parsed.nextTo,
-      environment.NEXT_PUBLIC_APP_URL,
+      environment.APP_URL,
     ).searchParams.get("token")!;
     const invitation = await getInvitationPreview(token);
     if (
@@ -326,7 +326,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
     const config = requireResendConfig();
     const resetUrl = new URL(
       "/reset-password",
-      environment.NEXT_PUBLIC_APP_URL,
+      environment.APP_URL,
     );
     resetUrl.searchParams.set("token", token);
     const { error } = await client.emails.send({

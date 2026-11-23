@@ -21,10 +21,9 @@ export default function WebsiteSettingsForm({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const origin =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (typeof window === "undefined"
+    typeof window === "undefined"
       ? "http://localhost:3000"
-      : window.location.origin);
+      : window.location.origin;
   const publicUrl = new URL("/wedding/" + initial.slug, origin).toString();
 
   async function save(event: FormEvent<HTMLFormElement>) {

@@ -13,7 +13,7 @@ const baseEnvironmentSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
-  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  APP_URL: z.string().url().default("http://localhost:3000"),
   MONGODB_URI: optionalSecret,
   MONGODB_DB_NAME: z.string().trim().min(1).default("mmm-db"),
   SESSION_SECRET: optionalSecret,

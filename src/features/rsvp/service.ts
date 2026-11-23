@@ -111,7 +111,7 @@ export async function createRsvpLink(
   return {
     url: new URL(
       `/invite/${token}`,
-      environment.NEXT_PUBLIC_APP_URL,
+      environment.APP_URL,
     ).toString(),
     expiresAt: expiresAt.toISOString(),
     active: true,

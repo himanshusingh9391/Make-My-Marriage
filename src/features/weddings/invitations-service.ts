@@ -361,7 +361,7 @@ export async function createWeddingInvitation(
     const client = new Resend(resendConfig.apiKey);
     const acceptUrl = new URL(
       "/invitations/accept",
-      environment.NEXT_PUBLIC_APP_URL,
+      environment.APP_URL,
     );
     acceptUrl.searchParams.set("token", token);
     const safeTitle = htmlEscape(wedding.weddingName);
