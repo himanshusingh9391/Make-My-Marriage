@@ -6,6 +6,8 @@ This file tracks major project milestones. Detailed requirements and architectur
 
 ## Current status
 
+The signed-out homepage uses locally bundled demo wedding photographs for its hero and celebration gallery, plus a sample QR preview. It does not depend on organizer gallery uploads or external image hosts, so sample photos load immediately and remain separate from private wedding media.
+
 The public wedding website is implemented at a shareable wedding slug. Owners, Admins, and Managers can publish or unpublish it, select a visual theme, and optionally show a livestream link. Publishing the website now makes all non-cancelled events and all wedding gallery photos visible, including events still marked Draft; cancelled events stay private. The hero prefers the Engagement event's assigned photo and falls back to the latest uploaded gallery photo. The heirloom chronicle shows a card for each event with its own latest assigned photo, date/time, venue, and short description; remaining uploaded photos appear in the additional memories lightbox. The active wedding-wide guest QR is rendered server-side from the same dashboard link. Public queries omit guest lists, invitations, tasks, expenses, vendors, private event notes, and internal IDs. TypeScript, lint, unit tests, production route smoke checks, and the live published wedding endpoint were verified; lint reports only `<img>` optimization warnings. A production build was not run because the active dev server owns `.next` on this Windows environment.
 
 Guest QR is available in the dashboard. Owners, Admins and Managers can share one 30-day QR code for the wedding and upload or delete gallery photos. Guests choose the event when uploading. Guests can upload and download shared photos without an account. Authenticated gallery uploads verify that the selected event is active and belongs to the same wedding.
@@ -92,7 +94,18 @@ Verify the guest QR and public wedding website with a phone against a reachable 
 
 **Next:** Share one wedding link with two independent browsers. Confirm one household attending, decline for the other, then revise the first response and verify the saved names, counts, and dashboard totals. For personal event invitations, verify automatic dashboard updates, capacity/deadline limits, expired/revoked links, cross-guest isolation, and responsive layouts. Confirm the deployment URL before sharing links externally. Verify Guests create/edit/delete, event selection, party limits, filters, invitation compatibility, and mobile/tablet layouts against the database. Verify Tasks create/edit/status/delete, filtering, member/event assignment isolation, timezone boundaries, and responsive browser flows, alongside the pending Events checks. Verify live Resend invitation and invited-account verification delivery with an approved recipient. Existing seeded member/guest acceptance, revocation, permissions, and responsive browser flows are verified. Confirm the next feature plan before starting implementation.
 
-## Progress log`r`n`r`n### 2026-11-23 — Manual review and route smoke verification`r`n`r`n- Verified the homepage and published wedding website, public wedding JSON, public event JSON, dashboard website settings, and guest QR route response against the running local app; public data returned four events and four event/gallery images, plus the active guest QR.`r`n- Reviewed the uncommitted public website, gallery, and guest QR changes. Fixed authenticated photo uploads to reject events outside the current wedding or events that are deleted/cancelled.`r`n- Verification: 32 unit tests passed; TypeScript and lint passed (12 image/font warnings); `git diff --check` passed. Production build was not run while the active dev server held the `.next` directory lock. Phone scanning requires a deployed/reachable URL.
+## Progress log
+
+### 2026-11-23 — Signed-out homepage demo photography
+
+- Replaced remote-image dependencies and vector illustration fallbacks in the signed-out hero and visual chronicle with locally bundled wedding photographs. Private gallery uploads are not used on the signed-out homepage; the sample QR preview remains illustrative.
+- Verification: homepage and all five local image URLs returned HTTP 200; TypeScript, targeted ESLint, all 32 unit tests, and `git diff --check` passed.
+
+### 2026-11-23 — Manual review and route smoke verification
+
+- Verified the homepage and published wedding website, public wedding JSON, public event JSON, dashboard website settings, and guest QR route response against the running local app; public data returned four events and four event/gallery images, plus the active guest QR.
+- Reviewed the uncommitted public website, gallery, and guest QR changes. Fixed authenticated photo uploads to reject events outside the current wedding or events that are deleted/cancelled.
+- Verification: 32 unit tests passed; TypeScript and lint passed (12 image/font warnings); `git diff --check` passed. Production build was not run while the active dev server held the `.next` directory lock. Phone scanning requires a deployed/reachable URL.
 
 ### 2026-11-22 — Public wedding site sections and guest photo sharing
 

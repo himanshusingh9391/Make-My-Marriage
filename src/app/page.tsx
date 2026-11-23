@@ -22,14 +22,12 @@ import SiteLogo from "./site-logo";
 import styles from "./home.module.css";
 
 const photos = {
-  couple:
-    "https://lh3.googleusercontent.com/aida/ALJJyrCdpLL7nT4h9tT5i6XBYT2g-B5Hka4qwG_GkFLbGMBaX_o-vrrVlZ9MqIdR_M5-5hfT9T9YeYIKt5FID5bK2hiE-dlOqRCzHVIsw-UvzD2RVWHvSznXgooo3ZgqHN-Ykh9KO-OdL8kkV8b6CoQ6RGNSwUR8RW1HAwBCqT9JX2aovqrr-AjgZcO8BX5_YVCaR951UijreYn2wQPwLAstOJodUO-GJZ_cB0L2v7an9oUW_w",
-  mandap:
-    "https://lh3.googleusercontent.com/aida/ALJJyrBAoimJEJ3i88HTl-JgqA3IxtIqD8xfsyaoUIFsZ7FWVD-Kq4meifMuzcZ1jRhulY2TUqMuywXKDEOW56e04LbKKHlMWVklvQeWDkeiUWY7r1YI-nTkZx3tqhKW9HQLLqTHg9SDsIvi8GZExWB92sxTayzS2G0t7JlLbKEBOaOiA2-WkMbjOS5SAWtorWabz6ZL1BnXs9fiuHmbL2oyKwT-mlFhpQWrIWZszSrIkHKl",
-  banquet:
-    "https://lh3.googleusercontent.com/aida/ALJJyrCFckPBArDtPn4gU9tF3kL3qZw3mL5XCL8tmN9uYAF5tY7Q-oPyftXVrSrI42brQpPydPSXFm-Se0JDji1kT6SVTOEc374ucuPjZrQa1eyAcUs4KUOxaKKPm-JBuDoa1zO3bm9j6z9HRRu_ie5CiuE6Qi3MHJtll7whAo1CyHBoHEUOKS81SLgMq1WdvLxe2ORCF2w7DRjybFHh4bnp47At2__glNpNF07QzwFjwVyDhg",
-  stationery:
-    "https://lh3.googleusercontent.com/aida/ALJJyrCntZNFgsVjoAASpQ_eQi24bxsBimtrqV9mcwR0RjiKY0uCMjA4Widl4AMg6DIgfWW9QB6KBi7tlJd3Hd4NmN6tT3HZSqmkpW27nNBg2lNmD63anqxS8zRQXMsVCXXGaCpBDbJIZrW8nDh1oIG8Zi4CAdVDb04E_15skIi3p2BvDdj1TbcFtkM8MyxPjZcsf-_rITtw7zXuYBO9nWzAkum4g0tLiFrTajwF33uXWofQ3Q",
+  // The signed-out homepage always uses local demo photographs. This keeps the
+  // preview independent of private gallery data and remote image availability.
+  couple: "/images/demo-wedding-couple.webp",
+  mandap: "/images/demo-wedding-ceremony.webp",
+  banquet: "/images/demo-wedding-reception.webp",
+  mehndi: "/images/demo-wedding-mehndi.webp",
   qr: "/images/qr-preview.svg",
 };
 
@@ -111,7 +109,7 @@ const planningStats = [
 const moments = [
   {
     image: photos.mandap,
-    fallbackImage: "/images/mandap.svg",
+    fallbackImage: photos.mandap,
     alt: "Marigold garlands framing the wedding mandap at sunset",
     eyebrow: "Zenana Mahal, Udaipur",
     title: "The Sunset Mandap & Sacred Pheras",
@@ -120,7 +118,7 @@ const moments = [
   },
   {
     image: photos.couple,
-    fallbackImage: "/images/wedding-couple.svg",
+    fallbackImage: photos.couple,
     alt: "Aanya and Kabir sharing a joyful moment together",
     eyebrow: "Unscripted moments",
     title: "Pure Joy & Shared Laughter",
@@ -129,7 +127,7 @@ const moments = [
   },
   {
     image: photos.banquet,
-    fallbackImage: "/images/banquet.svg",
+    fallbackImage: photos.banquet,
     alt: "A warm candlelit wedding banquet table",
     eyebrow: "Jagmandir Island Palace",
     title: "The Royal Candlelit Banquet",
@@ -137,13 +135,13 @@ const moments = [
       "Woven linen runners, handcrafted brass candelabras, and candlelight beneath historic vaulted arches.",
   },
   {
-    image: photos.stationery,
-    fallbackImage: "/images/stationery.svg",
-    alt: "Botanical wedding stationery with a wax seal",
-    eyebrow: "Artisanal letterpress",
-    title: "Botanical Invitation Papeterie",
+    image: photos.mehndi,
+    fallbackImage: photos.mehndi,
+    alt: "A bride's hands decorated with detailed mehndi and wedding bangles",
+    eyebrow: "Mehndi details",
+    title: "The Art of Bridal Mehndi",
     description:
-      "Deckle-edged cotton stationery, terracotta washes, and gold foil calligraphy sealed in brass wax.",
+      "Intricate henna and heirloom bangles bring a quiet, personal detail to the celebration.",
   },
 ];
 
@@ -344,7 +342,7 @@ export default async function HomePage() {
               <div className={styles.heroImageFrame}>
                 <CelebrationImage
                   src={photos.couple}
-                  fallbackSrc="/images/wedding-couple.svg"
+                  fallbackSrc={photos.couple}
                   alt="Aanya and Kabir celebrating their wedding in Udaipur"
                   fallbackLabel="Wedding portrait"
                   fill
