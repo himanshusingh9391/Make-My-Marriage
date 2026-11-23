@@ -1,0 +1,970 @@
+.site {
+  --accent: #1c3b2d;
+  --paper: #faf9f6;
+  --ink: #1c3b2d;
+  --muted: #68756d;
+  --surface: #fffefa;
+  --section: #f1f0eb;
+  --line: #e2ded5;
+  --highlight: #bb755e;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
+}
+
+.site[data-theme="MINIMAL_MODERN"] {
+  --accent: #315b62;
+  --paper: #f2f7f7;
+  --ink: #1e3539;
+  --muted: #62777a;
+  --surface: #fff;
+  --section: #e7f0f0;
+  --line: #c8dcde;
+  --highlight: #5a9a92;
+}
+
+.site[data-theme="TRADITIONAL_INDIAN"] {
+  --accent: #8c3f25;
+  --paper: #fcf4e8;
+  --ink: #38271e;
+  --muted: #796653;
+  --surface: #fffaf1;
+  --section: #f0dfc8;
+  --line: #dec6a7;
+  --highlight: #bd8240;
+}
+
+.header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 5vw, 5rem);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 95%, transparent);
+}
+
+.header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.8rem, 3vw, 2rem);
+}
+.header a {
+  color: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+.header nav a:hover {
+  color: var(--highlight);
+  transform: translateY(-1px);
+}
+
+.hero {
+  padding: clamp(3rem, 7vw, 6rem) clamp(1rem, 5vw, 4rem);
+  background: var(--paper);
+}
+.heroInner {
+  display: grid;
+  width: min(100%, 1360px);
+  min-height: 500px;
+  margin: auto;
+  align-items: center;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+.heroCopy {
+  max-width: 650px;
+  animation: hero-arrive 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.eyebrow,
+.sectionHeading > span,
+.eventType,
+.eventDate > span,
+.imageCaption {
+  color: var(--highlight);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+.heroCopy h1 {
+  margin: 1rem 0 1.2rem;
+  font:
+    400 clamp(3.1rem, 7.5vw, 6.6rem)/1.03 "Playfair Display",
+    Georgia,
+    serif;
+  overflow-wrap: anywhere;
+}
+.heroCopy h1 em {
+  display: block;
+  color: var(--accent);
+  font-weight: 400;
+}
+.heroDescription {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  line-height: 1.9;
+}
+.heroFacts {
+  display: grid;
+  margin-top: 1.8rem;
+  padding-block: 1.1rem;
+  border-block: 1px solid var(--line);
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1rem;
+}
+.heroFacts div {
+  display: grid;
+  gap: 0.4rem;
+}
+.heroFacts span {
+  color: var(--muted);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.heroFacts strong {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.heroActions,
+.shareActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.3rem;
+}
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1.15rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+.primaryButton {
+  background: var(--accent);
+  color: white;
+}
+.secondaryButton {
+  background: transparent;
+  color: var(--accent);
+}
+.primaryButton:hover,
+.secondaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.secondaryButton:hover {
+  background: var(--surface);
+}
+
+.heroVisual {
+  position: relative;
+  min-height: 350px;
+  aspect-ratio: 1.45;
+  overflow: visible;
+  border: 1px solid var(--line);
+  border-radius: 12px 12px 3px 3px;
+  background: var(--section);
+  box-shadow: 0 22px 55px #253b2b18;
+  animation: image-arrive 850ms 120ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.heroImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  border-radius: inherit;
+  object-fit: cover;
+}
+.heroPlaceholder {
+  display: grid;
+  min-height: inherit;
+  place-content: center;
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at 70% 22%,
+      color-mix(in srgb, var(--highlight) 35%, var(--paper)) 0 8%,
+      transparent 8.5%
+    ),
+    linear-gradient(
+      160deg,
+      var(--paper),
+      var(--section) 56%,
+      color-mix(in srgb, var(--accent) 65%, var(--paper))
+    );
+}
+.heroPlaceholder > span {
+  color: var(--highlight);
+  font-size: 4rem;
+}
+.heroPlaceholder p {
+  margin: 0.5rem;
+  color: white;
+  font:
+    400 clamp(1.6rem, 3vw, 2.5rem) "Playfair Display",
+    Georgia,
+    serif;
+}
+.heroPlaceholder small {
+  color: white;
+}
+.imageCaption {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #ffffff30;
+  border-radius: 6px;
+  background: #163a2ddd;
+  color: white;
+  font-size: 0.57rem;
+  letter-spacing: 0.08em;
+}
+.heroOrnament {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  color: var(--highlight);
+  font-size: 2rem;
+  animation: gentle-turn 16s linear infinite;
+}
+
+.countdownBand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 7vw, 7rem);
+  padding: 1.5rem;
+  background: var(--accent);
+  color: white;
+}
+.countdownBand div {
+  display: grid;
+  gap: 0.2rem;
+}
+.countdownBand div > span {
+  color: #ffffffbf;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.countdownBand strong {
+  font:
+    400 2.2rem "Playfair Display",
+    Georgia,
+    serif;
+}
+.countdownBand small {
+  color: var(--highlight);
+  font:
+    400 1rem "Plus Jakarta Sans",
+    sans-serif;
+}
+.countdownBand p {
+  color: #ffffffd0;
+  font-size: 0.82rem;
+}
+
+.events,
+.gallery,
+.sharePhotos,
+.livestream {
+  padding: clamp(4rem, 8vw, 7rem) clamp(1rem, 5vw, 4rem);
+}
+.events {
+  background: var(--section);
+}
+.sectionHeading {
+  max-width: 850px;
+  margin: 0 auto 2.8rem;
+  text-align: center;
+}
+.sectionHeading h2,
+.livestream h2 {
+  margin: 0.7rem 0;
+  color: var(--accent);
+  font:
+    400 clamp(2.3rem, 5.5vw, 4.2rem)/1.1 "Playfair Display",
+    Georgia,
+    serif;
+}
+.sectionHeading > p {
+  max-width: 700px;
+  margin: 0.7rem auto;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.eventList {
+  max-width: 1240px;
+  margin: 0 auto;
+  border-top: 1px solid var(--line);
+}
+.eventRow {
+  display: grid;
+  min-height: 190px;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+  grid-template-columns:
+    minmax(145px, 18%) minmax(0, 1fr) minmax(175px, 22%)
+    minmax(170px, 20%);
+  gap: clamp(1rem, 2.5vw, 2.4rem);
+  animation: card-enter 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.eventRow:not(:has(.eventImage)) {
+  grid-template-columns: minmax(145px, 18%) minmax(0, 1fr) minmax(180px, 25%);
+}
+.eventRow:nth-child(3n + 1) {
+  animation-delay: 80ms;
+}
+.eventRow:nth-child(3n + 2) {
+  animation-delay: 150ms;
+}
+.eventDate {
+  position: relative;
+  display: grid;
+  min-height: 72px;
+  align-content: center;
+  gap: 0.35rem;
+  padding-left: 1rem;
+  border-left: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.eventDate::before {
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--paper);
+  content: "";
+  transform: translateY(-50%);
+}
+.eventDate > span {
+  font-size: 0.58rem;
+}
+.eventDate strong {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.eventDate small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+.eventType {
+  font-size: 0.57rem;
+}
+.eventDetails h3 {
+  margin: 0.35rem 0;
+  font:
+    400 clamp(1.35rem, 2.3vw, 1.9rem)/1.2 "Playfair Display",
+    Georgia,
+    serif;
+}
+.eventDetails > p {
+  margin: 0.45rem 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+.attire {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+.eventImage {
+  width: 100%;
+  height: 138px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.eventRow .calendarButton {
+  grid-column: 2;
+  width: max-content;
+}
+.venue {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--line);
+  color: var(--accent);
+  text-decoration: none;
+}
+.venue > span:first-child {
+  color: var(--highlight);
+  font-size: 1.15rem;
+}
+.venue > span:last-child {
+  display: grid;
+  gap: 0.35rem;
+}
+.venue strong {
+  font-size: 0.76rem;
+}
+.venue small {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+.venue:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.emptyState {
+  max-width: 700px;
+  margin: 2rem auto 0;
+  padding: clamp(2rem, 5vw, 4rem);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  text-align: center;
+}
+.emptyState > span {
+  color: var(--highlight);
+  font-size: 2rem;
+}
+.emptyState h3 {
+  margin: 0.8rem 0;
+  font:
+    400 clamp(1.6rem, 4vw, 2.4rem) "Playfair Display",
+    Georgia,
+    serif;
+}
+.emptyState p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.gallery {
+  background: var(--paper);
+}
+.chronicleGrid {
+  display: grid;
+  max-width: 1280px;
+  margin: 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+}
+.chronicleCard {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 14px 34px #253b2b0a;
+  animation: card-enter 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.chronicleImage {
+  display: block;
+  width: 100%;
+  height: clamp(230px, 28vw, 390px);
+  object-fit: cover;
+}
+.chronicleImagePlaceholder {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  width: 100%;
+  height: clamp(230px, 28vw, 390px);
+  gap: 0.7rem;
+  padding: 1.5rem;
+  background: linear-gradient(140deg, var(--section), var(--paper));
+  color: var(--muted);
+  text-align: center;
+}
+.chronicleImagePlaceholder span {
+  color: var(--accent);
+  font-size: 2.8rem;
+}
+.chronicleImagePlaceholder small {
+  max-width: 250px;
+  line-height: 1.6;
+}
+.chronicleDetails {
+  display: grid;
+  gap: 0.55rem;
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+}
+.chronicleDetails > span {
+  color: var(--highlight);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.chronicleDetails h3,
+.moreMemories > h3 {
+  margin: 0;
+  color: var(--accent);
+  font:
+    400 clamp(1.45rem, 2.5vw, 2rem)/1.2 "Playfair Display",
+    Georgia,
+    serif;
+}
+.chronicleDetails p {
+  margin: 0.2rem 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+.chronicleDetails > small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+.moreMemories {
+  max-width: 1280px;
+  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+}
+.moreMemories > h3 {
+  margin-bottom: 1.3rem;
+  text-align: center;
+}
+.photoGrid {
+  display: grid;
+  max-width: 1280px;
+  margin: 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+.photoGrid button {
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: zoom-in;
+}
+.photoGrid button:nth-child(4n + 2),
+.photoGrid button:nth-child(4n + 3) {
+  margin-top: 2.4rem;
+}
+.photoGrid img {
+  display: block;
+  width: 100%;
+  height: clamp(250px, 34vw, 490px);
+  border-radius: 8px;
+  background: var(--section);
+  object-fit: cover;
+  transition:
+    transform 300ms ease,
+    filter 300ms ease;
+}
+.photoGrid button:hover img {
+  filter: saturate(1.08);
+  transform: scale(1.015);
+}
+.photoGrid button span {
+  display: block;
+  padding: 0.75rem 0.2rem;
+  color: var(--accent);
+  font:
+    400 clamp(1rem, 2vw, 1.35rem) "Playfair Display",
+    Georgia,
+    serif;
+}
+
+.calendarButton,
+.shareActions button {
+  margin-top: 0.4rem;
+  padding: 0.62rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+.calendarButton:hover,
+.shareActions button:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+}
+.sharePhotos {
+  background: var(--section);
+}
+.shareCard {
+  display: flex;
+  max-width: 1050px;
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 4rem);
+  margin: 0 auto;
+  padding: clamp(1.2rem, 4vw, 2.2rem);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 35px #253b2b0c;
+}
+.shareCard > img {
+  flex: 0 0 auto;
+  width: min(220px, 38vw);
+  height: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+.qrPlaceholder {
+  display: grid;
+  flex: 0 0 auto;
+  width: min(220px, 38vw);
+  min-height: 220px;
+  align-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  text-align: center;
+}
+.qrPlaceholder > span {
+  color: var(--accent);
+  font-size: 2.4rem;
+}
+.qrPlaceholder > strong {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.qrPlaceholder > small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+.shareCard strong {
+  font:
+    400 clamp(1.7rem, 3vw, 2.5rem) "Playfair Display",
+    Georgia,
+    serif;
+}
+.shareCard p {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+.shareActions {
+  margin-top: 1rem;
+}
+.shareActions .primaryButton {
+  min-height: 40px;
+  font-size: 0.72rem;
+}
+.qrDownload {
+  color: var(--accent);
+  font-size: 0.74rem;
+  text-underline-offset: 3px;
+}
+.qrDownload:hover {
+  color: var(--highlight);
+}
+
+.livestream {
+  text-align: center;
+  background: var(--paper);
+}
+.livestream > span {
+  color: var(--highlight);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+.livestream h2 {
+  margin: 0.7rem auto 1.2rem;
+}
+.footer {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 2.2rem 1rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.footer p,
+.footer small {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.footer :global(a) {
+  margin-inline: auto;
+}
+
+.lightbox {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  background: #151311ed;
+}
+.lightbox > img {
+  max-width: min(82vw, 1200px);
+  max-height: 82vh;
+  object-fit: contain;
+}
+.lightbox button {
+  border: 1px solid #ffffff65;
+  border-radius: 50%;
+  background: #ffffff1c;
+  color: white;
+  cursor: pointer;
+}
+.lightboxClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 42px;
+  height: 42px;
+  font-size: 1.7rem;
+}
+.lightboxPrev,
+.lightboxNext {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  font-size: 2rem;
+}
+
+@media (max-width: 900px) {
+  .heroInner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: 2rem;
+  }
+  .eventRow {
+    grid-template-columns: 125px minmax(0, 1fr) minmax(150px, 26%);
+  }
+  .eventImage {
+    grid-column: 2;
+    width: min(100%, 340px);
+  }
+  .eventRow .calendarButton {
+    grid-column: 2;
+  }
+  .venue {
+    grid-column: 3;
+    grid-row: 2 / span 2;
+  }
+  .eventRow:not(:has(.eventImage)) {
+    grid-template-columns: 125px minmax(0, 1fr) minmax(150px, 26%);
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .header nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .header nav a {
+    font-size: 0.74rem;
+  }
+  .hero {
+    padding-block: 2.5rem;
+  }
+  .heroInner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .heroCopy h1 {
+    font-size: clamp(3rem, 13vw, 5rem);
+  }
+  .heroVisual {
+    min-height: 270px;
+    aspect-ratio: 1.15;
+  }
+  .heroImage {
+    min-height: 270px;
+  }
+  .heroFacts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .countdownBand {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-inline: 1.3rem;
+  }
+  .countdownBand p {
+    margin: 0;
+  }
+  .events,
+  .gallery,
+  .sharePhotos,
+  .livestream {
+    padding-block: 3.5rem;
+  }
+  .eventRow,
+  .eventRow:not(:has(.eventImage)) {
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+  .eventDate {
+    align-self: start;
+  }
+  .eventImage {
+    grid-column: 2;
+    width: 100%;
+    height: 190px;
+  }
+  .eventRow .calendarButton {
+    grid-column: 2;
+  }
+  .venue {
+    grid-column: 2;
+    grid-row: auto;
+    margin-top: 0.2rem;
+    padding: 0.5rem 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .photoGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.3rem;
+  }
+  .chronicleGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chronicleImage {
+    height: clamp(240px, 74vw, 380px);
+  }
+  .chronicleImagePlaceholder {
+    height: clamp(240px, 74vw, 380px);
+  }
+  .photoGrid button:nth-child(4n + 2),
+  .photoGrid button:nth-child(4n + 3) {
+    margin-top: 0;
+  }
+  .photoGrid img {
+    height: clamp(250px, 80vw, 410px);
+  }
+  .shareCard {
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  .qrPlaceholder {
+    width: min(220px, 70vw);
+  }
+  .shareActions {
+    justify-content: center;
+  }
+  .lightbox {
+    gap: 0.4rem;
+    padding-inline: 0.5rem;
+  }
+  .lightbox > img {
+    max-width: calc(100vw - 110px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site,
+  .site *,
+  .site *::before,
+  .site *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .events,
+  .gallery,
+  .sharePhotos {
+    animation: section-arrive linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+}
+
+@keyframes hero-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes image-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(13px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes gentle-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes section-arrive {
+  from {
+    opacity: 0.35;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

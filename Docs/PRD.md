@@ -19,7 +19,7 @@ Make My Marriage is a wedding-planning web application. A registered user can ow
 
 ## 4. Scope
 ### In scope
-Auth; wedding workspace/details/settings; events/venues; guest CRUD and assignments; secure invitations; event-specific RSVP; dashboard; email through Resend; check-in; task planner; actual expense register; saved vendor directory with Google Places discovery; published wedding site; WhatsApp copy/share only; albums/photos with Cloudflare R2.
+Auth; wedding workspace/details/settings; events/venues; guest CRUD and assignments; secure invitations; event-specific RSVP; dashboard; email through Resend; check-in; task planner; actual expense register; saved vendor directory with Google Places discovery; published wedding site with a responsive itinerary, event calendar downloads, opt-in gallery, and account-free guest photo QR; WhatsApp copy/share only; albums/photos with Cloudinary.
 ### Out of scope
 Member role changes after joining (later increment), vendor accounts/marketplace transactions, payment processing, budget forecasting/remaining-budget calculations, WhatsApp Business API, native apps, subscription billing, AI planning, public guest registration, guest social network.
 
@@ -37,7 +37,7 @@ Member role changes after joining (later increment), vendor accounts/marketplace
 - **EXPENSES:** Actual amounts only, integer minor units (INR paise), category, date, optional saved vendor, payment state UNPAID/PARTIALLY_PAID/PAID. No budget projection.
 - **VENDORS:** Discover through Places, save only selected results, edit/delete; contact, category, address, website, place ID, rating snapshot, notes.
 - **PUBLIC SITE:** Published couple names/date/events/venue/theme/description/countdown/livestream/authorized gallery. Must never expose guest list, contacts, private notes, expenses, tasks, RSVP records, admin data or tokens.
-- **GALLERY:** Owner creates albums and access links/QR; validate upload size, MIME, extension and signature; R2 stores bytes, MongoDB stores metadata; owner alone deletes photos.
+- **GALLERY:** Owners, Admins and Managers can share a wedding-wide guest photo QR; validate upload size, MIME, extension and signature; R2 stores bytes, MongoDB stores metadata; owners, Admins and Managers can upload and delete wedding photos; guests select an event when uploading and may download shared photos.
 - **DASHBOARD:** Upcoming events, RSVP totals/rates/headcount, pending invitations/tasks, expense actual totals, recent activity, check-in, all scoped to selected wedding.
 
 ## 6. Key user flows

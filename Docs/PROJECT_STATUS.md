@@ -1,10 +1,16 @@
 # Make My Marriage — Project Status
 
-**Last updated:** 2026-11-21
+**Last updated:** 2026-11-23
 
 This file tracks major project milestones. Detailed requirements and architecture remain in `PRD.md`, `System_Design.md`, `DB_Design.md`, and `API_Design.md`.
 
 ## Current status
+
+The public wedding website is implemented at a shareable wedding slug. Owners, Admins, and Managers can publish or unpublish it, select a visual theme, and optionally show a livestream link. Publishing the website now makes all non-cancelled events and all wedding gallery photos visible, including events still marked Draft; cancelled events stay private. The hero prefers the Engagement event's assigned photo and falls back to the latest uploaded gallery photo. The heirloom chronicle shows a card for each event with its own latest assigned photo, date/time, venue, and short description; remaining uploaded photos appear in the additional memories lightbox. The active wedding-wide guest QR is rendered server-side from the same dashboard link. Public queries omit guest lists, invitations, tasks, expenses, vendors, private event notes, and internal IDs. TypeScript, lint, unit tests, production route smoke checks, and the live published wedding endpoint were verified; lint reports only `<img>` optimization warnings. A production build was not run because the active dev server owns `.next` on this Windows environment.
+
+Guest QR is available in the dashboard. Owners, Admins and Managers can share one 30-day QR code for the wedding and upload or delete gallery photos. Guests choose the event when uploading. Guests can upload and download shared photos without an account. Authenticated gallery uploads verify that the selected event is active and belongs to the same wedding.
+
+Wedding Gallery is now available from the dashboard with the supplied responsive empty state, responsive image masonry layout, and a drag-and-drop style upload dialog. Owners, Admins, and Managers can upload up to 20 JPEG, PNG, or WebP images per batch, up to 10 MB each, and optionally attach them to an existing wedding event. Uploads are signed server-side and stored in the configured Cloudinary account; MongoDB keeps only wedding-scoped photo metadata. TypeScript verification passed; browser upload verification remains next.
 
 Organizers can create and share one wedding RSVP link before adding events. Each household opens the invitation without signing in, enters its name, accepts or declines, and supplies its own headcount if attending. A successful submission now redirects to a unique private household link for later updates; reopening the original shared link starts a new household response. The guest directory and dashboard totals reflect saved responses. Targeted RSVP tests and TypeScript checks passed. Live browser and database verification is pending.
 
@@ -25,6 +31,20 @@ All page headers and the homepage footer now use the shared guest-homepage logo 
 The initial project foundation, responsive public homepage, owner authentication, first-workspace onboarding, editable wedding details, private dashboard, and first increment of wedding member invitations are implemented. Owners, Admins, and Managers can invite users as Admin or Manager through the configured Resend integration; invitations use single-use hashed tokens, seven-day expiry, invited email matching, accept/revoke flows, member visibility, and a selected-workspace landing after acceptance. Live Resend delivery has not been reverified in this review; the shared `resend.dev` testing sender only permits the Resend account recipient, while arbitrary recipients require a verified domain. Managers have the same invitation permissions as Admins. Role changes are deferred; owners can now remove Admin/Manager members and Admins and Managers can remove other Managers. Sign-up collects only the account name, email, and password; after sign-in, the owner can add and edit wedding details on the dashboard. The app targets `mmm-db` by default. The database initialization script now provisions 20 documented collections and their indexes. Local development can register and sign in without Resend; ordinary signup/login work without email verification; new accounts created through invitations must verify their email before signing in. Accountless guest invitations and event RSVPs are implemented. Photo uploads are pending.
 
 ## Completed milestones
+
+### 2026-11-23 — Public wedding itinerary, images, and QR rendering
+
+- Rendered the active wedding guest QR on the server using the exact current dashboard link, avoiding a blank QR while browser JavaScript initializes.
+- Prefer the published Engagement event's assigned gallery photo in the hero. Each event row displays only its own latest assigned image, never a generic photo repeated across unrelated events.
+- Show the gallery section when event-assigned photos are public, while unassigned wedding photos remain hidden unless gallery visibility is enabled. Removed duplicate management links from the website settings content; existing dashboard navigation remains the control surface.
+- Verification: TypeScript passed; lint completed without errors and with image-element optimization warnings. Production build was blocked by an `.next` directory lock/permission error; live database/browser verification was unavailable.
+
+### 2026-11-23 — Wedding chronicle gallery content correction
+
+- Removed the separate gallery-visibility checkbox from website settings; publishing the wedding website now exposes gallery photos and all non-cancelled events, including draft events. Cancelled events remain excluded.
+- Replaced the empty visual-chronicle-only photo grid with event cards showing one latest event-assigned image, date, time, venue, and a short description. Additional uploaded images remain accessible in a lightbox. The hero prefers the Engagement photo and falls back to the latest gallery photo.
+- Kept event, gallery, and guest QR controls in the existing dashboard navigation; removed duplicate controls from the website settings content.
+- Verification: TypeScript passed; targeted lint has no errors and reports image optimization warnings. Production build and live database/browser verification remain pending.
 
 ### Initial project scaffold — Complete
 
@@ -68,9 +88,42 @@ The initial project foundation, responsive public homepage, owner authentication
 
 ## Next milestone
 
+Verify the guest QR and public wedding website with a phone against a reachable Vercel deployment. Confirm the production URL, publish/unpublish behavior, event visibility, gallery opt-in, and public/private data boundaries.
+
 **Next:** Share one wedding link with two independent browsers. Confirm one household attending, decline for the other, then revise the first response and verify the saved names, counts, and dashboard totals. For personal event invitations, verify automatic dashboard updates, capacity/deadline limits, expired/revoked links, cross-guest isolation, and responsive layouts. Confirm the deployment URL before sharing links externally. Verify Guests create/edit/delete, event selection, party limits, filters, invitation compatibility, and mobile/tablet layouts against the database. Verify Tasks create/edit/status/delete, filtering, member/event assignment isolation, timezone boundaries, and responsive browser flows, alongside the pending Events checks. Verify live Resend invitation and invited-account verification delivery with an approved recipient. Existing seeded member/guest acceptance, revocation, permissions, and responsive browser flows are verified. Confirm the next feature plan before starting implementation.
 
-## Progress log
+## Progress log`r`n`r`n### 2026-11-23 — Manual review and route smoke verification`r`n`r`n- Verified the homepage and published wedding website, public wedding JSON, public event JSON, dashboard website settings, and guest QR route response against the running local app; public data returned four events and four event/gallery images, plus the active guest QR.`r`n- Reviewed the uncommitted public website, gallery, and guest QR changes. Fixed authenticated photo uploads to reject events outside the current wedding or events that are deleted/cancelled.`r`n- Verification: 32 unit tests passed; TypeScript and lint passed (12 image/font warnings); `git diff --check` passed. Production build was not run while the active dev server held the `.next` directory lock. Phone scanning requires a deployed/reachable URL.
+
+### 2026-11-22 — Public wedding site sections and guest photo sharing
+
+- Kept the celebrations section visible with a useful empty state when no events are published; draft events remain private. Added an admin shortcut to manage/publish events.
+- Added event calendar downloads, responsive gallery browsing with a keyboard-enabled lightbox, and a wedding-wide QR/share section on the public website.
+- Added the public, no-account photo page and wedding-scoped upload API. Guests can optionally choose a published event; guest contributions are distinguished from organizer uploads in photo metadata.
+- Updated API/database docs. Verification: `npm run typecheck` passed; targeted ESLint passed with only existing `<img>` optimization warnings. Browser, Cloudinary, and Vercel QR checks remain pending.
+
+### 2026-11-22 — Public website themes, motion, and current guest QR
+
+- Added scroll-aware section entrance and gentle hover motion with reduced-motion support. Redesigned theme variables so Elegant Royal, Minimal Modern, and Traditional Indian produce visibly different site palettes consistent with the public homepage.
+- The public site now renders the same active guest QR URL shown in the Guest QR dashboard. QR generation remains hashed at rest; server-side HMAC derivation uses a random generation nonce, and regeneration/revocation/expiry are respected.
+- Uses real Cloudinary photos assigned to published events for the hero/event cards; general gallery photos remain opt-in. Verification: typecheck and Webpack production build passed; targeted ESLint passed with only `<img>` optimization warnings. Browser interaction and live QR rotation/revocation checks remain pending.
+
+### 2026-11-22 — Data-driven public wedding website redesign
+
+- Rebuilt the public page to follow the public homepage’s visual language while keeping the root homepage unchanged. The split hero, date/city facts, countdown, celebration timeline, event images, venue map links, dress codes, calendar downloads, visual gallery, and guest QR now use the selected wedding’s own data.
+- Public event rows are sourced only from PUBLISHED, non-deleted events. Photos attached to those public events can illustrate the itinerary; unassigned gallery photos remain governed by the gallery visibility setting. No sample couple, location, or ceremony text is shown.
+- Verification: typecheck and Webpack production build passed. Targeted ESLint passed with image optimization warnings; browser verification remains pending.
+
+### 2026-11-22 — Public wedding website
+
+Added authenticated website settings for publication state, theme, livestream URL, and gallery visibility, plus a responsive public page at `/wedding/{slug}`. The public page and REST responses include only approved wedding details, published events, and opted-in gallery photos. Event-linked uploads appear on their event cards, with an uploaded gallery image as the visual fallback. Draft/cancelled events and private notes are excluded. TypeScript verification passed. Browser and deployment checks remain pending.
+
+### 2026-11-22 — Wedding-wide guest QR
+
+Moved event selection to the guest upload page, added wedding-scoped event validation and granted Admins and Managers equal gallery and QR permissions. Existing album links retain their original scope. TypeScript and guest gallery/form tests cover the change; live phone and Cloudinary verification is pending.
+
+### 2026-11-22 — Guest QR photo albums
+
+Added event-scoped guest upload and download, owner-only deletion with in-app confirmation, and expiring hashed access tokens. TypeScript and four gallery validation tests passed. Local HTTP checks confirmed the dashboard sign-in redirect and a 404 for an invalid guest link. Live photo transfer and phone scanning remain unverified.
 
 ### 2026-11-21 - Personal invitations and automatic RSVP updates
 

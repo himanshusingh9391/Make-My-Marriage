@@ -32,6 +32,7 @@ const weddingSchema = new Schema(
       default: "DRAFT",
       required: true,
     },
+    publishedAt: { type: Date, default: null },
   },
   { timestamps: true, collection: "weddings" },
 );

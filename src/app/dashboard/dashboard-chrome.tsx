@@ -26,7 +26,16 @@ import styles from "./dashboard.module.css";
 type Props = {
   fullName: string;
   workspaceId: string;
-  active: "overview" | "members" | "events" | "tasks" | "guests" | "rsvp";
+  active:
+    | "overview"
+    | "members"
+    | "events"
+    | "tasks"
+    | "guests"
+    | "rsvp"
+    | "gallery"
+    | "guest-qr"
+    | "wedding-website";
   accountRole: string;
   weddingName?: string;
 };
@@ -124,21 +133,24 @@ export function DashboardSidebar({
             <p className={styles.navGroupLabel}>{group.label}</p>
             {group.items.map(({ label, icon: Icon }) =>
               (label === "Events" ||
+                label === "Gallery" ||
+                label === "Guest QR" ||
+                label === "Wedding website" ||
                 label === "Tasks" ||
                 label === "Guest list" ||
                 label === "Invitations & RSVP") &&
               workspaceId ? (
                 <Link
                   key={label}
-                  className={`${styles.navItem} ${styles.navItemLink} ${active === (label === "Guest list" ? "guests" : label === "Invitations & RSVP" ? "rsvp" : label.toLowerCase()) ? styles.navItemActive : ""}`}
-                  href={`/dashboard/${label === "Guest list" ? "guests" : label === "Invitations & RSVP" ? "rsvp" : label.toLowerCase()}?workspace=${workspaceId}`}
+                  className={`${styles.navItem} ${styles.navItemLink} ${active === (label === "Guest list" ? "guests" : label === "Invitations & RSVP" ? "rsvp" : label.toLowerCase().replaceAll(" ", "-")) ? styles.navItemActive : ""}`}
+                  href={`/dashboard/${label === "Guest list" ? "guests" : label === "Invitations & RSVP" ? "rsvp" : label.toLowerCase().replaceAll(" ", "-")}?workspace=${workspaceId}`}
                   aria-current={
                     active ===
                     (label === "Guest list"
                       ? "guests"
                       : label === "Invitations & RSVP"
                         ? "rsvp"
-                        : label.toLowerCase())
+                        : label.toLowerCase().replaceAll(" ", "-"))
                       ? "page"
                       : undefined
                   }

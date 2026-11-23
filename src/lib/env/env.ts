@@ -26,6 +26,9 @@ const baseEnvironmentSchema = z.object({
   R2_SECRET_ACCESS_KEY: optionalSecret,
   R2_BUCKET_NAME: optionalSecret,
   R2_ENDPOINT: optionalSecret,
+  CLOUDINARY_CLOUD_NAME: optionalSecret,
+  CLOUDINARY_API_KEY: optionalSecret,
+  CLOUDINARY_API_SECRET: optionalSecret,
   GOOGLE_PLACES_API_KEY: optionalSecret,
   RATE_LIMIT_SECRET: optionalSecret,
 });
@@ -91,4 +94,18 @@ export function requireGooglePlacesApiKey(): string {
     .trim()
     .min(1, "GOOGLE_PLACES_API_KEY is required for Places search")
     .parse(environment.GOOGLE_PLACES_API_KEY);
+}
+
+export function requireCloudinaryConfig() {
+  return z
+    .object({
+      cloudName: z.string().trim().min(1),
+      apiKey: z.string().trim().min(1),
+      apiSecret: z.string().trim().min(1),
+    })
+    .parse({
+      cloudName: environment.CLOUDINARY_CLOUD_NAME,
+      apiKey: environment.CLOUDINARY_API_KEY,
+      apiSecret: environment.CLOUDINARY_API_SECRET,
+    });
 }

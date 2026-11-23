@@ -1,0 +1,65 @@
+.card {
+  width: min(100%, 52rem);
+  margin: clamp(1rem, 4vw, 3rem) auto;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  border: 1px solid #dfded5;
+  border-radius: 14px;
+  background: #fffefa;
+  color: #344b3a;
+  overflow-wrap: anywhere;
+}
+.card h1 {
+  font:
+    500 clamp(2rem, 6vw, 3.5rem) Georgia,
+    serif;
+}
+.card p {
+  margin: 1rem 0;
+}
+.card select,
+.card input {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  border: 1px solid #cecfc6;
+  border-radius: 6px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+.card button,
+.actions a {
+  border-radius: 6px;
+  background: #4b2733;
+  color: white;
+  border: 0;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+}
+.card button:disabled {
+  opacity: 0.55;
+}
+.qr {
+  width: 16rem;
+  max-width: 100%;
+  height: auto;
+}
+.photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.photos img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.photos a {
+  text-decoration: underline;
+}

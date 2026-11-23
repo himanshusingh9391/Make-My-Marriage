@@ -10,6 +10,15 @@ const weddingSettingsSchema = new Schema(
       index: true,
     },
     description: { type: String, trim: true, maxlength: 1200, default: "" },
+    websitePublished: { type: Boolean, default: false, required: true },
+    theme: {
+      type: String,
+      enum: ["ELEGANT_ROYAL", "MINIMAL_MODERN", "TRADITIONAL_INDIAN"],
+      default: "ELEGANT_ROYAL",
+      required: true,
+    },
+    livestreamUrl: { type: String, trim: true, maxlength: 500, default: "" },
+    galleryVisible: { type: Boolean, default: false, required: true },
   },
   { timestamps: true, collection: "wedding_settings" },
 );

@@ -8,7 +8,7 @@ Shared collections, logically tenant-isolated by `weddingId`. One user owns many
 
 ## 2. Collections
 
-`users`, `user_sessions`, `email_verification_tokens`, `password_reset_tokens`, `auth_rate_limits`, `weddings`, `wedding_settings`, `wedding_memberships`, `wedding_invitations`, `events`, `guests`, `guest_events`, `rsvps`, `tasks`, `expenses`, `vendors`, `albums`, `photos`, `email_logs`, `activity_logs`.
+`users`, `user_sessions`, `email_verification_tokens`, `password_reset_tokens`, `auth_rate_limits`, `weddings`, `wedding_settings`, `wedding_memberships`, `wedding_invitations`, `events`, `guests`, `guest_events`, `rsvps`, `tasks`, `expenses`, `vendors`, `albums`, `photos`, `email_logs`, `activity_logs`. Photo documents may include `guestShared` to distinguish public guest contributions from organizer uploads; every photo remains scoped by `weddingId` and Cloudinary assets remain managed server-side.
 
 ## 3. ER diagram
 
@@ -49,7 +49,7 @@ erDiagram
 - **wedding_memberships:** weddingId, userId, role (ADMIN/MANAGER), invitedByUserId, joinedAt, timestamps. Unique `(weddingId,userId)`. The owner remains in `weddings.ownerUserId` and is not duplicated as a membership.
 - **wedding_invitations:** weddingId, invitedByUserId, email/normalizedEmail, role (ADMIN/MANAGER), tokenHash, activeInvitationKey (unique sparse wedding/email key while active), expiresAt, acceptedAt, revokedAt, deliveryStatus (PENDING/SENT/FAILED), sentAt, deliveryError, timestamps. Raw tokens are never stored. Retain accepted/revoked/expired records for invitation history; expiry is app-enforced, not TTL-deleted.
 - **auth_rate_limits:** HMAC-hashed action/client key, attempt count, expiry timestamp; TTL cleanup. No raw IP address or email is stored.
-- **wedding_settings:** weddingId unique; theme; website publication, description (up to 1,200 characters), countdown, livestream; RSVP defaults/deadline updates; gallery enabled/visibility; email invitation/reminder toggles. Wedding title is stored as `weddings.weddingName`.
+- **wedding_settings:** weddingId unique; theme; websitePublished; description (up to 1,200 characters); livestreamUrl; galleryVisible; RSVP defaults/deadline updates; gallery enabled/visibility; email invitation/reminder toggles. Wedding title is stored as `weddings.weddingName`. First publication timestamp is stored as `weddings.publishedAt`.
 - **events:** weddingId, name/type, description, startDate/endDate/timezone, venue object (address, GeoJSON Point, Place ID, directions URL), RSVP deadline, maxAttendees, dressCode, notes, status (DRAFT/PUBLISHED/CANCELLED), timestamps.
 - **guests:** weddingId, fullName, email/normalizedEmail, phone, groupName, invitationTokenHash, invitationStatus, invitationSentAt, notes, timestamps.
 - **guest_events:** weddingId, guestId, eventId, maxAttendees; checkIn status/time/count/notes; timestamps.
@@ -218,3 +218,7 @@ RSVP batches use a MongoDB transaction. Internal rsvpRevision increments on gues
 shared_rsvp_links stores one link per wedding (_id), a signing nonce, token hash, selected event IDs, party limit and expiration. Shared-link registration creates a household response in one transaction.
 Wedding-wide responses store householdKey (hashed), householdStatus and householdCount on the wedding-scoped guest. They require no guest-event assignment. Each saved household receives a separate hashed `rsvpTokenHash`, with the shared-link expiry and revocation state, so its private update link cannot identify or edit another household. Existing event responses keep their event scope.
 Shared-link household mobile numbers use the existing optional guests.phone field.
+
+### Guest gallery access
+
+`galleryGuestLinks` stores new wedding-wide codes with weddingWide=true and eventId=null, and legacy event-specific records, with weddingId, eventId, SHA-256 token hash and expiresAt. New wedding-wide records also store a random generation nonce; the public QR token is HMAC-derived server-side from the wedding ID, nonce, and token secret so the latest QR can be rendered on the public wedding site without storing a raw token. Replacing or revoking the link rotates/removes this generation and immediately invalidates its QR. Wedding-wide links read guestShared photos for the wedding; legacy links also filter by eventId. Existing private photos stay outside the guest album.

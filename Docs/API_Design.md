@@ -734,11 +734,12 @@ Vendor discovery is server-mediated. The application persists selected vendor re
 
 ## 16. Public Wedding Website APIs
 
-| Method | Endpoint                         | Purpose                        |
-| ------ | -------------------------------- | ------------------------------ |
-| GET    | `/public/weddings/{slug}`        | Get published wedding website  |
-| GET    | `/public/weddings/{slug}/events` | Get published events           |
-| GET    | `/public/weddings/{slug}/albums` | Get publicly authorized albums |
+| Method | Endpoint                         | Purpose                                                  |
+| ------ | -------------------------------- | -------------------------------------------------------- |
+| GET    | `/public/weddings/{slug}`        | Get published wedding website                            |
+| GET    | `/public/weddings/{slug}/events` | Get active, non-cancelled events                         |
+| GET    | `/public/weddings/{slug}/albums` | Get publicly authorized albums                           |
+| POST   | `/public/weddings/{slug}/photos` | Upload one guest-shared wedding photo without an account |
 
 Public responses must exclude:
 
@@ -753,9 +754,15 @@ Public responses must exclude:
 - Invitation tokens.
 - Internal IDs not required by the public UI.
 
-Only published wedding content is returned.
+Only active weddings with websitePublished enabled are returned. The public wedding response contains couple names, city, date, timezone, description, theme, optional livestream URL, all non-cancelled events, and uploaded gallery photos. The website publication switch is the public visibility boundary for the itinerary and wedding gallery. Each event exposes at most its latest assigned photo in its event card; the gallery collection can include the other uploaded wedding photos. Event responses omit notes, capacity, RSVP deadlines, and internal event IDs. The API never returns guest lists, guest contact details, RSVP records, tasks, expenses, vendor data, owner account information, or invitation tokens.
+
+The website editor uses authenticated `GET` and `PATCH /weddings/{weddingId}/website` operations. The update body contains websitePublished, theme (ELEGANT_ROYAL, MINIMAL_MODERN, or TRADITIONAL_INDIAN), and livestreamUrl. The public page is available at `/wedding/{slug}`. It renders every non-cancelled event, including draft planning records, when the wedding website is published; cancelled events remain hidden. The public photo QR resolves to the latest active wedding-wide Guest QR at `/guest-photos/{token}`; the QR page and dashboard use the same derived URL, and regenerate/revoke/expiry changes what the website shares. Raw QR tokens are never stored: the server derives them from a random generation nonce and token secret, then stores only their hash. Guest uploads use the existing public guest-photo API and event selection flow. Guests can select any non-cancelled wedding event. QR photo uploads do not expose internal wedding or event IDs.
 
 ## 17. Album and Gallery APIs
+
+### Cloudinary gallery implementation — 2026-11-21
+
+The current first gallery increment uses Cloudinary for image bytes and MongoDB for photo metadata. `GET /weddings/{weddingId}/photos` lists only the authorized wedding's photos. `POST /weddings/{weddingId}/photos` is a same-origin, session-authenticated multipart request with `photos` (1–20 JPEG/PNG/WebP files, maximum 10 MB each) and optional `eventId`. The server validates files before signing Cloudinary uploads; it returns saved photo metadata in the standard success envelope. Cloudinary credentials remain server-only environment variables and are never returned to the browser. Photo deletion, albums, guest access, and public-site gallery delivery remain subsequent increments.
 
 | Method | Endpoint                                              | Purpose                      |
 | ------ | ----------------------------------------------------- | ---------------------------- |
@@ -784,7 +791,7 @@ Only published wedding content is returned.
 
 Objects remain private by default. Presigned URLs are short-lived and scoped to the authorized object.
 
-Only the owner can delete photos.
+Owners, Admins and Managers can delete photos in their wedding.
 
 ## 18. Dashboard API
 
@@ -1071,3 +1078,7 @@ Guest confirmations update immediately from the save response. Dashboard/Guests/
 Shared invitations (2026-11-21): POST /api/v1/weddings/{weddingId}/shared-invitation with eventIds and maxPartySize issues or replaces a 30-day link. DELETE revokes registration. Public POST /api/v1/guest/invitations/open/{token} accepts name, optional phone, visitorKey, status (YES/NO), and attendeeCount (1–1000 for YES, 0 for NO). It returns 201 `{ path: "/invite/households/{privateToken}" }`.
 
 The shared link remains a reusable starting form for every household. After a successful response the browser clears its temporary visitor key and redirects to the returned private household link. Public GET and PUT `/guest/invitations/households/{privateToken}` read or update only that household's name, optional phone, attendance status, and attendee count. The raw private token is delivered only once in the redirect path; only its hash is stored, it shares the common link expiry, and link revocation invalidates it. Opening the common link later starts a fresh response rather than editing a prior household.
+
+### Guest photo QR (Cloudinary gallery)
+
+Owners, Admins and Managers can POST or DELETE /weddings/{weddingId}/guest-qr without a body. POST issues one wedding-wide code and replaces the previous wedding-wide code. DELETE revokes all guest photo codes for the wedding. The public upload accepts a photo and an optional eventId belonging to an active event in this wedding. Codes expire after 30 days. Legacy album links keep their original scope.
